@@ -29,7 +29,7 @@ export default function Home() {
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ repeat: Infinity, duration: 3 }}
             >
-              MassKribbl
+              <span className="text-black">MassKribbl</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}
@@ -88,7 +88,7 @@ export default function Home() {
           className="text-center mb-12"
         >
           <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-rainbow bg-clip-text text-transparent">
-            MassKribbl
+            <span className="text-black">MassKribbl</span>
           </h1>
           <p className="text-lg text-white/80">
             Welcome back, <span className="text-primary font-semibold">{user.username}</span>!
