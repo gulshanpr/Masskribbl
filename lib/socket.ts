@@ -5,6 +5,7 @@ export interface DrawingStroke {
   points: { x: number; y: number }[]
   color: string
   size: number
+  tool: 'brush' | 'eraser' | 'line' | 'rectangle' | 'square' | 'circle' | 'dotted'
   timestamp: number
 }
 
@@ -65,15 +66,8 @@ class SocketManager {
       console.log('Disconnected from server')
       // Try to reconnect after a short delay
       setTimeout(() => {
-        if (user && roomCode) {
-          socket.emit('room:reconnect', {
-            roomCode,
-            player: {
-              id: user.id,
-              username: user.username,
-              avatar: user.avatar
-            }
-          })
+        if (this.socket) {
+          this.socket.connect()
         }
       }, 1000)
     })

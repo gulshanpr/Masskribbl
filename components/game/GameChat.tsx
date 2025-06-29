@@ -51,7 +51,7 @@ export default function GameChat() {
     if (!message.trim() || !user) return
 
     const chatMessage: ChatMessage = {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${user.id}`,
       playerId: user.id,
       username: user.username,
       message: message.trim(),
@@ -73,6 +73,11 @@ export default function GameChat() {
       sendMessage()
     }
   }
+
+  // Deduplicate messages
+  const uniqueMessages = messages.filter((message, index, self) => 
+    index === self.findIndex(m => m.id === message.id)
+  )
 
   return (
     <>
@@ -114,7 +119,7 @@ export default function GameChat() {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               <AnimatePresence>
-                {messages.map((msg) => (
+                {uniqueMessages.map((msg) => (
                   <motion.div
                     key={msg.id}
                     initial={{ opacity: 0, y: 20 }}

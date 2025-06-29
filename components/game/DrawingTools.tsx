@@ -4,7 +4,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { useGameStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
-import { Brush, Eraser, Palette } from 'lucide-react'
+import { Brush, Eraser, Palette, Square, Circle, Minus, MoreHorizontal } from 'lucide-react'
 
 const COLORS = [
   '#000000', '#ffffff', '#ff0080', '#ff8c00', '#40e0d0', '#32cd32',
@@ -31,6 +31,16 @@ export default function DrawingTools() {
 
   if (!canDraw) return null
 
+  const tools = [
+    { id: 'brush', icon: Brush, label: 'Brush' },
+    { id: 'eraser', icon: Eraser, label: 'Eraser' },
+    { id: 'line', icon: Minus, label: 'Line' },
+    { id: 'rectangle', icon: Square, label: 'Rectangle' },
+    { id: 'square', icon: Square, label: 'Square' },
+    { id: 'circle', icon: Circle, label: 'Circle' },
+    { id: 'dotted', icon: MoreHorizontal, label: 'Dotted Line' }
+  ]
+
   return (
     <motion.div
       initial={{ x: -100, opacity: 0 }}
@@ -40,23 +50,20 @@ export default function DrawingTools() {
       {/* Tool Selection */}
       <div className="space-y-2">
         <h3 className="text-sm font-medium text-white">Tools</h3>
-        <div className="flex gap-2">
-          <Button
-            variant={currentTool === 'brush' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setCurrentTool('brush')}
-            className="flex-1"
-          >
-            <Brush className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={currentTool === 'eraser' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setCurrentTool('eraser')}
-            className="flex-1"
-          >
-            <Eraser className="w-4 h-4" />
-          </Button>
+        <div className="grid grid-cols-2 gap-2">
+          {tools.map((tool) => (
+            <Button
+              key={tool.id}
+              variant={currentTool === tool.id ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setCurrentTool(tool.id as any)}
+              className="flex items-center gap-1 text-xs h-8"
+              title={tool.label}
+            >
+              <tool.icon className="w-3 h-3" />
+              <span className="hidden sm:inline">{tool.label}</span>
+            </Button>
+          ))}
         </div>
       </div>
 
@@ -79,7 +86,7 @@ export default function DrawingTools() {
       </div>
 
       {/* Color Palette */}
-      {currentTool === 'brush' && (
+      {currentTool !== 'eraser' && (
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-white flex items-center gap-2">
             <Palette className="w-4 h-4" />
@@ -94,7 +101,8 @@ export default function DrawingTools() {
                 onClick={() => setBrushColor(color)}
                 className={`
                   w-8 h-8 rounded-full border-2 transition-all
-                  ${brushColor === color ? 'border-white scale-110' : 'border-gray-400'}
+                  ${brushColor === color ? 'border-white scale-110 ring-2 ring-primary' : 'border-gray-400'}
+                  ${color === '#ffffff' ? 'border-gray-600' : ''}
                 `}
                 style={{ backgroundColor: color }}
               />
@@ -107,16 +115,21 @@ export default function DrawingTools() {
       <div className="pt-2 border-t border-white/20">
         <div className="flex items-center gap-2 text-sm text-white">
           <div
-            className="w-6 h-6 rounded-full border border-white/40"
+            className="rounded-full border border-white/40 flex-shrink-0"
             style={{
-              backgroundColor: currentTool === 'brush' ? brushColor : '#666',
-              width: `${Math.max(brushSize / 2, 6)}px`,
-              height: `${Math.max(brushSize / 2, 6)}px`
+              backgroundColor: currentTool === 'eraser' ? '#ff6b6b' : brushColor,
+              width: `${Math.max(brushSize / 2, 8)}px`,
+              height: `${Math.max(brushSize / 2, 8)}px`
             }}
           />
-          <span>
-            {currentTool === 'brush' ? 'Brush' : 'Eraser'} • {brushSize}px
-          </span>
+          <div className="flex flex-col">
+            <span className="font-medium">
+              {tools.find(t => t.id === currentTool)?.label || 'Brush'}
+            </span>
+            <span className="text-xs text-white/60">
+              {brushSize}px
+            </span>
+          </div>
         </div>
       </div>
     </motion.div>
