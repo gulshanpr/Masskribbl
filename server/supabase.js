@@ -1,13 +1,13 @@
 require('dotenv').config()
 const { createClient } = require('@supabase/supabase-js')
 
-const supabaseUrl = process.env.SUPABASE_URL || 'https://yoeuzmajnmvskbslhgrb.supabase.co'
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvZXV6bWFqbm12c2tic2xoZ3JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyMDcyMTMsImV4cCI6MjA2Njc4MzIxM30.h4JmfAVVatQXf6zHtJT3xGfJSpn35UvdcEl1NXTqSKY'
+const supabaseUrl = process.env.SUPABASE_URL || ''
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
 // Use service role key for server-side operations
 const supabase = createClient(
-  process.env.SUPABASE_URL || 'https://yoeuzmajnmvskbslhgrb.supabase.co',
-  process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvZXV6bWFqbm12c2tic2xoZ3JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyMDcyMTMsImV4cCI6MjA2Njc4MzIxM30.h4JmfAVVatQXf6zHtJT3xGfJSpn35UvdcEl1NXTqSKY'
+  process.env.SUPABASE_URL || '',
+  process.env.SUPABASE_ANON_KEY || ''
 )
 
 // Database operations for server
