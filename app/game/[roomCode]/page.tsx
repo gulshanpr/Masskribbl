@@ -184,8 +184,10 @@ export default function GameRoom() {
               <h1 className="text-2xl font-bold text-white">Room {roomCode}</h1>
               <p className="text-white/60 text-sm">
                 {gameState.status === 'waiting' ? 'Waiting for players...' :
-                 gameState.status === 'playing' ? 'Game in progress' :
-                 'Game finished'}
+                 gameState.status === 'choosing' ? 'Choosing word...' :
+                 gameState.status === 'drawing' ? 'Drawing in progress' :
+                 gameState.status === 'finished' ? 'Game finished' :
+                 'Game in progress'}
               </p>
             </div>
           </div>
