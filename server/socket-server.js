@@ -44,7 +44,9 @@ async function createRoom(hostId, maxPlayers = 8, maxRounds = 3) {
       scores: {},
       roundStartTime: null,
       gameId: gameSession.id, // Database ID
-      currentRoundId: null
+      currentRoundId: null,
+      correctGuessers: new Set(), // Track who guessed correctly this round
+      roundTimer: null
     }
     
     rooms.set(roomCode, room)
@@ -118,6 +120,13 @@ async function startGame(roomCode) {
 async function startRound(room) {
   // Reset drawing state
   room.players.forEach(p => p.isDrawing = false)
+  room.correctGuessers.clear()
+  
+  // Clear any existing timer
+  if (room.roundTimer) {
+    clearInterval(room.roundTimer)
+    room.roundTimer = null
+  }
   
   // Select next drawer (round-robin)
   const drawerIndex = (room.currentRound - 1) % room.players.length
@@ -182,16 +191,40 @@ async function selectWord(room, word) {
   broadcastGameState(room)
   
   // Start drawing timer
-  const timer = setInterval(() => {
+  room.roundTimer = setInterval(() => {
     room.timeLeft--
-    if (room.timeLeft <= 0) {
-      clearInterval(timer)
-      endRound(room)
+    
+    // Check if all players (except drawer) have guessed correctly
+    const nonDrawerPlayers = room.players.filter(p => p.id !== room.currentDrawer)
+    const allGuessedCorrectly = nonDrawerPlayers.length > 0 && 
+      nonDrawerPlayers.every(p => room.correctGuessers.has(p.id))
+    
+    if (room.timeLeft <= 0 || allGuessedCorrectly) {
+      clearInterval(room.roundTimer)
+      room.roundTimer = null
+      
+      // If all guessed correctly, wait 5 seconds before ending round
+      if (allGuessedCorrectly && room.timeLeft > 5) {
+        room.timeLeft = 5
+        io.to(room.code).emit('game:allGuessed')
+        
+        setTimeout(() => {
+          endRound(room)
+        }, 5000)
+      } else {
+        endRound(room)
+      }
     }
   }, 1000)
 }
 
 async function endRound(room) {
+  // Clear timer
+  if (room.roundTimer) {
+    clearInterval(room.roundTimer)
+    room.roundTimer = null
+  }
+  
   try {
     // End round in database
     if (room.currentRoundId) {
@@ -211,6 +244,7 @@ async function endRound(room) {
   room.currentWord = null
   room.timeLeft = 0
   room.currentRoundId = null
+  room.correctGuessers.clear()
   
   if (room.currentRound >= room.maxRounds) {
     await endGame(room)
@@ -440,14 +474,39 @@ io.on('connection', (socket) => {
     const room = rooms.get(socket.roomCode)
     if (!room) return
     
+    // Prevent duplicate messages by checking timestamp and user
+    const recentMessages = room.recentMessages || []
+    const isDuplicate = recentMessages.some(msg => 
+      msg.playerId === message.playerId && 
+      msg.message === message.message &&
+      Date.now() - msg.timestamp < 1000 // Within 1 second
+    )
+    
+    if (isDuplicate) return
+    
+    // Store recent message to prevent duplicates
+    if (!room.recentMessages) room.recentMessages = []
+    room.recentMessages.push({
+      playerId: message.playerId,
+      message: message.message,
+      timestamp: Date.now()
+    })
+    
+    // Keep only last 10 messages for duplicate checking
+    if (room.recentMessages.length > 10) {
+      room.recentMessages = room.recentMessages.slice(-10)
+    }
+    
     // Check if message is a correct guess
     let isCorrect = false
     if (room.status === 'drawing' && 
         room.currentWord && 
         message.playerId !== room.currentDrawer &&
+        !room.correctGuessers.has(message.playerId) &&
         message.message.toLowerCase().trim() === room.currentWord.toLowerCase()) {
       
       isCorrect = true
+      room.correctGuessers.add(message.playerId)
       
       // Award points
       const timeBonus = Math.max(0, Math.floor(room.timeLeft / 10))

@@ -31,8 +31,8 @@ interface GameStore {
   isConnected: boolean
   setIsConnected: (connected: boolean) => void
   
-  currentTool: 'brush' | 'eraser'
-  setCurrentTool: (tool: 'brush' | 'eraser') => void
+  currentTool: 'brush' | 'eraser' | 'line' | 'rectangle' | 'square' | 'circle' | 'dotted'
+  setCurrentTool: (tool: 'brush' | 'eraser' | 'line' | 'rectangle' | 'square' | 'circle' | 'dotted') => void
   
   brushSize: number
   setBrushSize: (size: number) => void
@@ -64,9 +64,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
   
   // Chat state
   messages: [],
-  addMessage: (message) => set((state) => ({ 
-    messages: [...state.messages, message].slice(-100) // Keep last 100 messages
-  })),
+  addMessage: (message) => set((state) => {
+    // Check if message already exists
+    const messageExists = state.messages.some(m => m.id === message.id)
+    if (messageExists) {
+      return state // Don't add duplicate
+    }
+    
+    return { 
+      messages: [...state.messages, message].slice(-100) // Keep last 100 messages
+    }
+  }),
   clearMessages: () => set({ messages: [] }),
   
   // UI state
