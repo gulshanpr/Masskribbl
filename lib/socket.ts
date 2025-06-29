@@ -1,0 +1,111 @@
+import { io, Socket } from 'socket.io-client'
+
+export interface DrawingStroke {
+  id: string
+  points: { x: number; y: number }[]
+  color: string
+  size: number
+  timestamp: number
+}
+
+export interface Player {
+  id: string
+  username: string
+  avatar: string
+  score: number
+  isDrawing: boolean
+  isReady: boolean
+}
+
+export interface GameState {
+  roomCode: string
+  players: Player[]
+  currentDrawer: string | null
+  currentWord: string | null
+  wordChoices: string[] | null
+  round: number
+  maxRounds: number
+  timeLeft: number
+  status: 'waiting' | 'choosing' | 'drawing' | 'finished'
+  scores: Record<string, number>
+}
+
+export interface ChatMessage {
+  id: string
+  playerId: string
+  username: string
+  message: string
+  timestamp: number
+  isGuess: boolean
+  isCorrect?: boolean
+}
+
+class SocketManager {
+  private socket: Socket | null = null
+  private reconnectAttempts = 0
+  private maxReconnectAttempts = 5
+
+  connect(): Socket {
+    if (this.socket?.connected) {
+      return this.socket
+    }
+
+    this.socket = io(process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001', {
+      transports: ['websocket', 'polling'],
+      timeout: 20000,
+      forceNew: true,
+    })
+
+    this.socket.on('connect', () => {
+      console.log('Connected to server')
+      this.reconnectAttempts = 0
+    })
+
+    this.socket.on('disconnect', () => {
+      console.log('Disconnected from server')
+      // Try to reconnect after a short delay
+      setTimeout(() => {
+        if (user && roomCode) {
+          socket.emit('room:reconnect', {
+            roomCode,
+            player: {
+              id: user.id,
+              username: user.username,
+              avatar: user.avatar
+            }
+          })
+        }
+      }, 1000)
+    })
+
+    this.socket.on('connect_error', (error) => {
+      console.error('Connection error:', error)
+      this.handleReconnect()
+    })
+
+    return this.socket
+  }
+
+  private handleReconnect() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++
+      setTimeout(() => {
+        console.log(`Reconnection attempt ${this.reconnectAttempts}`)
+        this.socket?.connect()
+      }, Math.pow(2, this.reconnectAttempts) * 1000)
+    }
+  }
+
+  disconnect() {
+    if (this.socket) {
+      this.socket.disconnect()
+      this.socket = null
+    }
+  }
+
+  getSocket(): Socket | null {
+    return this.socket
+  }
+}
+
+export const socketManager = new SocketManager()
