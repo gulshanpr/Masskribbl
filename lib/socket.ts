@@ -20,6 +20,7 @@ export interface Player {
 
 export interface GameState {
   roomCode: string
+  hostId: string
   players: Player[]
   currentDrawer: string | null
   currentWord: string | null

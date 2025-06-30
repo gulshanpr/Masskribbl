@@ -297,6 +297,7 @@ async function endGame(room) {
 function broadcastGameState(room) {
   const gameState = {
     roomCode: room.code,
+    hostId: room.hostId,
     players: room.players,
     currentDrawer: room.currentDrawer,
     currentWord: room.status === 'drawing' ? getWordHint(room.currentWord, 0) : room.currentWord,

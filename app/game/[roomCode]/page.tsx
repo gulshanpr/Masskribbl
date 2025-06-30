@@ -147,7 +147,7 @@ export default function GameRoom() {
     )
   }
 
-  const isHost = gameState.players[0]?.id === user?.id
+  const isHost = gameState.hostId === user?.id
   const canStartGame = isHost && gameState.status === 'waiting' && gameState.players.length >= 2
 
   // Add debugging
