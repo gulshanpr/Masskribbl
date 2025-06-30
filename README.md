@@ -1,4 +1,4 @@
-# MassKribbl - Real-time Multiplayer Drawing Game
+<!-- # MassKribbl - Real-time Multiplayer Drawing Game
 
 A production-grade, real-time multiplayer "Draw & Guess" web game built with Next.js, TypeScript, Socket.IO, and Supabase. Features a stunning, colorful, modern UI designed to attract and retain users.
 
@@ -219,4 +219,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Ready to draw and guess? Start playing MassKribbl now!** 🎨✨
+**Ready to draw and guess? Start playing MassKribbl now!** 🎨✨ -->
