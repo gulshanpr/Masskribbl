@@ -174,11 +174,11 @@ export default function DrawingCanvas() {
       }
       const stroke = {
         id: Date.now().toString(),
-        from: lastPoint,
-        to: pos,
+        points: [lastPoint, pos],
         color: currentTool === 'eraser' ? canvasBackground : brushColor,
         size: brushSize,
-        tool: currentTool
+        tool: currentTool,
+        timestamp: Date.now()
       }
       addStroke(stroke)
       const socket = socketManager.getSocket()
@@ -189,7 +189,7 @@ export default function DrawingCanvas() {
       const preview = getPreviewContext()
       if (preview) {
         preview.ctx.clearRect(0, 0, preview.canvas.width, preview.canvas.height)
-        const color = currentTool === 'eraser' ? canvasBackground : brushColor
+        const color = brushColor
         switch (currentTool) {
           case 'rectangle':
             drawRectangle(preview.ctx, shapeStart, pos, color, brushSize)
@@ -238,21 +238,21 @@ export default function DrawingCanvas() {
     if (['rectangle', 'square', 'circle', 'line'].includes(currentTool)) {
       addStroke({
         id: Date.now().toString(),
-        from: shapeStart,
-        to: pos,
+        points: [shapeStart, pos],
         color,
         size: brushSize,
-        tool: currentTool
+        tool: currentTool,
+        timestamp: Date.now()
       })
       const socket = socketManager.getSocket()
       if (socket) {
         socket.emit('drawing:stroke', {
           id: Date.now().toString(),
-          from: shapeStart,
-          to: pos,
+          points: [shapeStart, pos],
           color,
           size: brushSize,
-          tool: currentTool
+          tool: currentTool,
+          timestamp: Date.now()
         })
       }
     }
@@ -304,11 +304,11 @@ export default function DrawingCanvas() {
       }
       const stroke = {
         id: Date.now().toString(),
-        from: lastPoint,
-        to: pos,
+        points: [lastPoint, pos],
         color: currentTool === 'eraser' ? canvasBackground : brushColor,
         size: brushSize,
-        tool: currentTool
+        tool: currentTool,
+        timestamp: Date.now()
       }
       addStroke(stroke)
       const socket = socketManager.getSocket()
@@ -318,7 +318,7 @@ export default function DrawingCanvas() {
       const preview = getPreviewContext()
       if (preview) {
         preview.ctx.clearRect(0, 0, preview.canvas.width, preview.canvas.height)
-        const color = currentTool === 'eraser' ? canvasBackground : brushColor
+        const color = brushColor
         switch (currentTool) {
           case 'rectangle':
             console.log('Drawing rectangle')
@@ -375,21 +375,21 @@ export default function DrawingCanvas() {
     if (['rectangle', 'square', 'circle', 'line'].includes(currentTool) && pos) {
       addStroke({
         id: Date.now().toString(),
-        from: shapeStart,
-        to: pos,
+        points: [shapeStart, pos],
         color,
         size: brushSize,
-        tool: currentTool
+        tool: currentTool,
+        timestamp: Date.now()
       })
       const socket = socketManager.getSocket()
       if (socket) {
         socket.emit('drawing:stroke', {
           id: Date.now().toString(),
-          from: shapeStart,
-          to: pos,
+          points: [shapeStart, pos],
           color,
           size: brushSize,
-          tool: currentTool
+          tool: currentTool,
+          timestamp: Date.now()
         })
       }
     }
@@ -436,8 +436,8 @@ export default function DrawingCanvas() {
       ctx.lineJoin = 'round'
       
       ctx.beginPath()
-      ctx.moveTo(stroke.from.x, stroke.from.y)
-      ctx.lineTo(stroke.to.x, stroke.to.y)
+      ctx.moveTo(stroke.points[0].x, stroke.points[0].y)
+      ctx.lineTo(stroke.points[1].x, stroke.points[1].y)
       ctx.stroke()
     })
   }
@@ -453,21 +453,21 @@ export default function DrawingCanvas() {
         if (!context) return
         const ctx = context.ctx
         const color = stroke.tool === 'eraser' ? canvasBackground : stroke.color
-        console.log('handleIncomingStroke', { tool: stroke.tool, from: stroke.from, to: stroke.to, color, size: stroke.size })
+        console.log('handleIncomingStroke', { tool: stroke.tool, from: stroke.points[0], to: stroke.points[1], color, size: stroke.size })
         switch (stroke.tool) {
           case 'brush':
           case 'eraser':
           case 'line':
-            drawLine(ctx, stroke.from, stroke.to, color, stroke.size)
+            drawLine(ctx, stroke.points[0], stroke.points[1], color, stroke.size)
             break
           case 'rectangle':
-            drawRectangle(ctx, stroke.from, stroke.to, color, stroke.size)
+            drawRectangle(ctx, stroke.points[0], stroke.points[1], color, stroke.size)
             break
           case 'square':
-            drawSquare(ctx, stroke.from, stroke.to, color, stroke.size)
+            drawSquare(ctx, stroke.points[0], stroke.points[1], color, stroke.size)
             break
           case 'circle':
-            drawCircle(ctx, stroke.from, stroke.to, color, stroke.size)
+            drawCircle(ctx, stroke.points[0], stroke.points[1], color, stroke.size)
             break
         }
       }
@@ -521,16 +521,16 @@ export default function DrawingCanvas() {
         case 'brush':
         case 'eraser':
         case 'line':
-          drawLine(ctx, stroke.from, stroke.to, color, stroke.size)
+          drawLine(ctx, stroke.points[0], stroke.points[1], color, stroke.size)
           break
         case 'rectangle':
-          drawRectangle(ctx, stroke.from, stroke.to, color, stroke.size)
+          drawRectangle(ctx, stroke.points[0], stroke.points[1], color, stroke.size)
           break
         case 'square':
-          drawSquare(ctx, stroke.from, stroke.to, color, stroke.size)
+          drawSquare(ctx, stroke.points[0], stroke.points[1], color, stroke.size)
           break
         case 'circle':
-          drawCircle(ctx, stroke.from, stroke.to, color, stroke.size)
+          drawCircle(ctx, stroke.points[0], stroke.points[1], color, stroke.size)
           break
       }
     })
