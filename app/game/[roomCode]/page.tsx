@@ -12,6 +12,7 @@ import PlayerList from '@/components/game/PlayerList'
 import GameTimer from '@/components/game/GameTimer'
 import WordChoices from '@/components/game/WordChoices'
 import WordHint from '@/components/game/WordHint'
+import GameEndHandler from '@/components/game/GameEndHandler'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Copy, Share2, Home } from 'lucide-react'
@@ -249,6 +250,9 @@ export default function GameRoom() {
 
       {/* Word Selection Modal */}
       <WordChoices />
+      
+      {/* Game End Handler */}
+      <GameEndHandler />
     </div>
   )
 }

@@ -113,6 +113,38 @@ export type Database = {
           joined_at?: string
         }
       }
+      game_rounds: {
+        Row: {
+          id: string
+          game_id: string
+          round_number: number
+          drawer_id: string
+          word: string
+          started_at: string
+          ended_at: string | null
+          duration_seconds: number
+        }
+        Insert: {
+          id?: string
+          game_id: string
+          round_number: number
+          drawer_id: string
+          word: string
+          started_at?: string
+          ended_at?: string | null
+          duration_seconds?: number
+        }
+        Update: {
+          id?: string
+          game_id?: string
+          round_number?: number
+          drawer_id?: string
+          word?: string
+          started_at?: string
+          ended_at?: string | null
+          duration_seconds?: number
+        }
+      }
       words: {
         Row: {
           id: string
@@ -357,7 +389,7 @@ export const dbOperations = {
     return data
   },
 
-  async joinGame(gameId: string, playerId: string) {
+  async addGameParticipant(gameId: string, playerId: string) {
     const { data, error } = await supabase
       .from('game_participants')
       .insert({
@@ -376,6 +408,42 @@ export const dbOperations = {
       .from('game_sessions')
       .update(updates)
       .eq('id', id)
+      .select()
+      .single()
+    
+    if (error) throw error
+    return data
+  },
+
+  async createGameRound(roundData: Database['public']['Tables']['game_rounds']['Insert']) {
+    const { data, error } = await supabase
+      .from('game_rounds')
+      .insert(roundData)
+      .select()
+      .single()
+    
+    if (error) throw error
+    return data
+  },
+
+  async endGameRound(roundId: string) {
+    const { data, error } = await supabase
+      .from('game_rounds')
+      .update({ ended_at: new Date().toISOString() })
+      .eq('id', roundId)
+      .select()
+      .single()
+    
+    if (error) throw error
+    return data
+  },
+
+  async updateParticipantScore(gameId: string, playerId: string, score: number) {
+    const { data, error } = await supabase
+      .from('game_participants')
+      .update({ score })
+      .eq('game_id', gameId)
+      .eq('player_id', playerId)
       .select()
       .single()
     
@@ -433,6 +501,16 @@ export const dbOperations = {
     const { data, error } = await query
     if (error) throw error
     return data
+  },
+
+  async clearDrawingStrokes(gameId: string, roundId: string) {
+    const { error } = await supabase
+      .from('drawing_strokes')
+      .delete()
+      .eq('game_id', gameId)
+      .eq('round_id', roundId)
+    
+    if (error) throw error
   },
 
   // Leaderboard operations

@@ -2,16 +2,19 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import { useGameStore } from '@/lib/store'
 import LoginForm from '@/components/auth/LoginForm'
 import QuickPlay from '@/components/lobby/QuickPlay'
 import CreateRoom from '@/components/lobby/CreateRoom'
 import JoinRoom from '@/components/lobby/JoinRoom'
-import { Palette, Sparkles, Users, Trophy } from 'lucide-react'
+import { Palette, Sparkles, Users, Trophy, BarChart3 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Toaster } from 'react-hot-toast'
 
 export default function Home() {
   const { user } = useGameStore()
+  const router = useRouter()
 
   if (!user) {
     return (
@@ -87,6 +90,17 @@ export default function Home() {
           animate={{ y: 0, opacity: 1 }}
           className="text-center mb-12"
         >
+          <div className="flex items-center justify-between mb-6">
+            <div></div>
+            <Button
+              onClick={() => router.push('/leaderboard')}
+              className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold animate-glow"
+            >
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Leaderboard
+            </Button>
+          </div>
+          
           <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-rainbow bg-clip-text text-transparent">
             <span className="text-black">MassKribbl</span>
           </h1>
