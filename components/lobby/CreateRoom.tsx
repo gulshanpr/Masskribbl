@@ -30,6 +30,29 @@ export default function CreateRoom() {
       const socket = socketManager.connect()
       console.log('Socket connected:', socket.connected)
       
+      // Set up event listeners first
+      const roomCreatedHandler = (roomCode: string) => {
+        console.log('Room created successfully:', roomCode)
+        setIsCreating(false)
+        router.push(`/game/${roomCode}`)
+      }
+
+      const errorHandler = (error: string) => {
+        console.error('Failed to create room:', error)
+        setIsCreating(false)
+      }
+
+      socket.on('room:created', roomCreatedHandler)
+      socket.on('error', errorHandler)
+      
+      // Set a timeout to prevent infinite loading
+      const timeout = setTimeout(() => {
+        console.error('Room creation timeout')
+        socket.off('room:created', roomCreatedHandler)
+        socket.off('error', errorHandler)
+        setIsCreating(false)
+      }, 15000) // 15 second timeout
+      
       socket.emit('room:create', {
         hostId: user.id,
         maxPlayers,
@@ -37,14 +60,17 @@ export default function CreateRoom() {
       })
       console.log('Room create event emitted')
 
-      socket.on('room:created', (roomCode: string) => {
-        console.log('Room created successfully:', roomCode)
-        router.push(`/game/${roomCode}`)
+      // Clear timeout when room is created
+      socket.once('room:created', () => {
+        clearTimeout(timeout)
+        socket.off('room:created', roomCreatedHandler)
+        socket.off('error', errorHandler)
       })
 
-      socket.on('error', (error: string) => {
-        console.error('Failed to create room:', error)
-        setIsCreating(false)
+      socket.once('error', () => {
+        clearTimeout(timeout)
+        socket.off('room:created', roomCreatedHandler)
+        socket.off('error', errorHandler)
       })
     } catch (error) {
       console.error('Failed to create room:', error)

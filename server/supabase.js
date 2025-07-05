@@ -1,11 +1,18 @@
 require("dotenv").config();
 const { createClient } = require("@supabase/supabase-js");
+require("dotenv").config();
+const { createClient } = require("@supabase/supabase-js");
 
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const supabaseUrl = process.env.SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
 // Use service role key for server-side operations
 const supabase = createClient(
+  process.env.SUPABASE_URL || "",
+  process.env.SUPABASE_ANON_KEY || ""
+);
   process.env.SUPABASE_URL || "",
   process.env.SUPABASE_ANON_KEY || ""
 );
@@ -16,8 +23,13 @@ const dbOperations = {
   async createGameSession(gameData) {
     const { data, error } = await supabase
       .from("game_sessions")
+      .from("game_sessions")
       .insert(gameData)
       .select()
+      .single();
+
+    if (error) throw error;
+    return data;
       .single();
 
     if (error) throw error;
@@ -27,9 +39,15 @@ const dbOperations = {
   async updateGameSession(id, updates) {
     const { data, error } = await supabase
       .from("game_sessions")
+      .from("game_sessions")
       .update(updates)
       .eq("id", id)
+      .eq("id", id)
       .select()
+      .single();
+
+    if (error) throw error;
+    return data;
       .single();
 
     if (error) throw error;
@@ -38,6 +56,9 @@ const dbOperations = {
 
   async getGameSession(roomCode) {
     const { data, error } = await supabase
+      .from("game_sessions")
+      .select(
+        `
       .from("game_sessions")
       .select(
         `
@@ -53,17 +74,30 @@ const dbOperations = {
 
     if (error && error.code !== "PGRST116") throw error;
     return data;
+      `
+      )
+      .eq("room_code", roomCode)
+      .single();
+
+    if (error && error.code !== "PGRST116") throw error;
+    return data;
   },
 
   // Game participants operations
   async addGameParticipant(gameId, playerId) {
     const { data, error } = await supabase
       .from("game_participants")
+      .from("game_participants")
       .insert({
         game_id: gameId,
         player_id: playerId,
+        player_id: playerId,
       })
       .select()
+      .single();
+
+    if (error) throw error;
+    return data;
       .single();
 
     if (error) throw error;
@@ -73,10 +107,17 @@ const dbOperations = {
   async updateParticipantScore(gameId, playerId, score) {
     const { data, error } = await supabase
       .from("game_participants")
+      .from("game_participants")
       .update({ score })
       .eq("game_id", gameId)
       .eq("player_id", playerId)
+      .eq("game_id", gameId)
+      .eq("player_id", playerId)
       .select()
+      .single();
+
+    if (error) throw error;
+    return data;
       .single();
 
     if (error) throw error;
@@ -86,7 +127,12 @@ const dbOperations = {
   async removeGameParticipant(gameId, playerId) {
     const { error } = await supabase
       .from("game_participants")
+      .from("game_participants")
       .delete()
+      .eq("game_id", gameId)
+      .eq("player_id", playerId);
+
+    if (error) throw error;
       .eq("game_id", gameId)
       .eq("player_id", playerId);
 
@@ -97,8 +143,13 @@ const dbOperations = {
   async createGameRound(roundData) {
     const { data, error } = await supabase
       .from("game_rounds")
+      .from("game_rounds")
       .insert(roundData)
       .select()
+      .single();
+
+    if (error) throw error;
+    return data;
       .single();
 
     if (error) throw error;
@@ -108,9 +159,15 @@ const dbOperations = {
   async endGameRound(roundId) {
     const { data, error } = await supabase
       .from("game_rounds")
+      .from("game_rounds")
       .update({ ended_at: new Date().toISOString() })
       .eq("id", roundId)
+      .eq("id", roundId)
       .select()
+      .single();
+
+    if (error) throw error;
+    return data;
       .single();
 
     if (error) throw error;
@@ -121,8 +178,13 @@ const dbOperations = {
   async saveChatMessage(messageData) {
     const { data, error } = await supabase
       .from("chat_messages")
+      .from("chat_messages")
       .insert(messageData)
       .select()
+      .single();
+
+    if (error) throw error;
+    return data;
       .single();
 
     if (error) throw error;
@@ -133,8 +195,13 @@ const dbOperations = {
   async saveDrawingStroke(strokeData) {
     const { data, error } = await supabase
       .from("drawing_strokes")
+      .from("drawing_strokes")
       .insert(strokeData)
       .select()
+      .single();
+
+    if (error) throw error;
+    return data;
       .single();
 
     if (error) throw error;
@@ -144,7 +211,12 @@ const dbOperations = {
   async clearDrawingStrokes(gameId, roundId) {
     const { error } = await supabase
       .from("drawing_strokes")
+      .from("drawing_strokes")
       .delete()
+      .eq("game_id", gameId)
+      .eq("round_id", roundId);
+
+    if (error) throw error;
       .eq("game_id", gameId)
       .eq("round_id", roundId);
 
@@ -154,8 +226,14 @@ const dbOperations = {
   // Word operations
   async getRandomWords(count = 3, category = null, difficulty = null) {
     const { data, error } = await supabase.rpc("get_random_words", {
+    const { data, error } = await supabase.rpc("get_random_words", {
       word_count: count,
       word_category: category,
+      word_difficulty: difficulty,
+    });
+
+    if (error) throw error;
+    return data;
       word_difficulty: difficulty,
     });
 
@@ -166,8 +244,13 @@ const dbOperations = {
   // User statistics
   async updateUserStats(userId, scoreGained, won = false) {
     const { error } = await supabase.rpc("update_user_stats", {
+    const { error } = await supabase.rpc("update_user_stats", {
       user_id: userId,
       score_gained: scoreGained,
+      won,
+    });
+
+    if (error) throw error;
       won,
     });
 
@@ -186,5 +269,16 @@ const dbOperations = {
     return data;
   },
 };
+      .from("users")
+      .select("*")
+      .eq("id", userId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+};
+
+module.exports = { supabase, dbOperations };
 
 module.exports = { supabase, dbOperations };

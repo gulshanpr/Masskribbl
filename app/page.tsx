@@ -1,5 +1,15 @@
 "use client";
+"use client";
 
+import React from "react";
+import { motion } from "framer-motion";
+import { useGameStore } from "@/lib/store";
+import LoginForm from "@/components/auth/LoginForm";
+import QuickPlay from "@/components/lobby/QuickPlay";
+import CreateRoom from "@/components/lobby/CreateRoom";
+import JoinRoom from "@/components/lobby/JoinRoom";
+import { Palette, Sparkles, Users, Trophy } from "lucide-react";
+import { Toaster } from "react-hot-toast";
 import React from "react";
 import { motion } from "framer-motion";
 import { useGameStore } from "@/lib/store";
@@ -11,6 +21,7 @@ import { Palette, Sparkles, Users, Trophy } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 
 export default function Home() {
+  const { user } = useGameStore();
   const { user } = useGameStore();
 
   if (!user) {
@@ -40,6 +51,7 @@ export default function Home() {
               Draw, Guess, and Have Fun with Friends!
             </motion.p>
 
+
             {/* Features */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
@@ -48,6 +60,10 @@ export default function Home() {
               className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12"
             >
               {[
+                { icon: Palette, text: "Creative Drawing" },
+                { icon: Users, text: "Multiplayer Fun" },
+                { icon: Sparkles, text: "Real-time Play" },
+                { icon: Trophy, text: "Compete & Win" },
                 { icon: Palette, text: "Creative Drawing" },
                 { icon: Users, text: "Multiplayer Fun" },
                 { icon: Sparkles, text: "Real-time Play" },
@@ -75,6 +91,7 @@ export default function Home() {
         </div>
       </div>
     );
+    );
   }
 
   return (
@@ -87,50 +104,12 @@ export default function Home() {
           animate={{ y: 0, opacity: 1 }}
           className="text-center mb-12"
         >
-          <div className="flex items-center justify-between mb-6">
-            {/* User Profile Section */}
-            <div className="flex items-center gap-4">
-              <Avatar className="w-12 h-12 ring-2 ring-primary/40">
-                <AvatarImage src={user.avatar} />
-                <AvatarFallback className="bg-gradient-to-br from-purple-600 to-pink-600 text-white font-bold">
-                  {user.username.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="text-left">
-                <p className="text-lg font-semibold text-white">
-                  {user.username}
-                </p>
-                <p className="text-sm text-white/60">
-                  {user.email}
-                </p>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={() => router.push('/leaderboard')}
-                className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold animate-glow"
-              >
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Leaderboard
-              </Button>
-              
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                className="bg-white/10 border-white/20 text-white hover:bg-red-500/20 hover:border-red-500/40 hover:text-red-200 transition-all duration-300"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
-            </div>
-          </div>
-          
           <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-rainbow bg-clip-text text-transparent">
             <span className="text-black">MassKribbl</span>
           </h1>
           <p className="text-lg text-white/80">
+            Welcome back,{" "}
+            <span className="text-primary font-semibold">{user.username}</span>!
             Welcome back,{" "}
             <span className="text-primary font-semibold">{user.username}</span>!
           </p>
@@ -157,6 +136,8 @@ export default function Home() {
             <p className="text-white/60 mb-6">
               Join thousands of players in the most fun drawing and guessing
               game online!
+              Join thousands of players in the most fun drawing and guessing
+              game online!
             </p>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
@@ -177,4 +158,6 @@ export default function Home() {
       </div>
     </div>
   );
+  );
 }
+
