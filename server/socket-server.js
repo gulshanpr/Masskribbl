@@ -652,7 +652,10 @@ setInterval(() => {
 
 const PORT = process.env.PORT || 3001
 
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`Socket.IO server running on port ${PORT}`)
-  console.log('Make sure to set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables')
+  console.log('Environment variables check:')
+  console.log('- SUPABASE_URL:', !!process.env.SUPABASE_URL)
+  console.log('- SUPABASE_SERVICE_ROLE_KEY:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
+  console.log('- NODE_ENV:', process.env.NODE_ENV)
 })
