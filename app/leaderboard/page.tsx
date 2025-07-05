@@ -74,14 +74,16 @@ export default function LeaderboardPage() {
       setLoading(true)
       const data = await dbOperations.getLeaderboard(selectedPeriod, 50)
       
+      console.log(`Leaderboard data for ${selectedPeriod}:`, data)
+      
       // Transform data to match our interface
       const transformedData: LeaderboardPlayer[] = data.map((item: any, index: number) => ({
         id: item.player_id,
         username: item.users?.username || 'Unknown',
         avatar_url: item.users?.avatar_url,
-        total_score: item.total_score,
-        games_played: item.games_played,
-        games_won: item.games_won,
+        total_score: item.total_score || 0,
+        games_played: item.games_played || 0,
+        games_won: item.games_won || 0,
         average_score: parseFloat(item.average_score) || 0,
         win_rate: parseFloat(item.win_rate) || 0,
         rank: index + 1
@@ -89,13 +91,16 @@ export default function LeaderboardPage() {
       
       setPlayers(transformedData)
       
-      // Calculate stats
+      // Calculate stats for the selected period
+      const totalScore = transformedData.reduce((sum, p) => sum + p.total_score, 0)
+      
+              // Get the actual number of games for this period
+        const totalGames = await dbOperations.getGameCountForPeriod(selectedPeriod)
+      
       setStats({
         totalPlayers: transformedData.length,
-        totalGames: transformedData.reduce((sum, p) => sum + p.games_played, 0),
-        averageScore: transformedData.length > 0 
-          ? Math.round(transformedData.reduce((sum, p) => sum + p.total_score, 0) / transformedData.length)
-          : 0
+        totalGames: totalGames,
+        averageScore: transformedData.length > 0 ? Math.round(totalScore / transformedData.length) : 0
       })
     } catch (error) {
       console.error('Failed to fetch leaderboard:', error)
@@ -324,7 +329,7 @@ export default function LeaderboardPage() {
                   <AnimatePresence>
                     {players.map((player, index) => (
                       <motion.div
-                        key={player.id}
+                        key={`${player.id}-${selectedPeriod}-${index}`}
                         variants={itemVariants}
                         initial="hidden"
                         animate="visible"
@@ -449,7 +454,7 @@ export default function LeaderboardPage() {
           transition={{ delay: 1 }}
           className="text-center mt-8 text-white/40 text-sm"
         >
-          <p>Leaderboard updates in real-time • Last updated: {new Date().toLocaleTimeString()}</p>
+          <p>Leaderboard updates in real-time • Last updated: <span suppressHydrationWarning>{new Date().toLocaleTimeString()}</span></p>
         </motion.div>
       </div>
     </div>

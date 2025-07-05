@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import { useGameStore } from '@/lib/store'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -30,6 +31,8 @@ interface WinnerPopupProps {
 
 export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCurrentUser }: WinnerPopupProps) {
   const [showConfetti, setShowConfetti] = useState(false)
+  const router = useRouter()
+  const { clearStrokes, clearMessages, setGameState } = useGameStore()
 
   useEffect(() => {
     if (isOpen && isCurrentUser) {
@@ -68,6 +71,32 @@ export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCur
       return () => clearInterval(interval)
     }
   }, [isOpen, isCurrentUser])
+
+  const handleBackToLobby = () => {
+    // Clear game state
+    clearStrokes()
+    clearMessages()
+    setGameState(null)
+    
+    // Close popup
+    onClose()
+    
+    // Navigate to home/lobby
+    router.push('/')
+  }
+
+  const handlePlayAgain = () => {
+    // Clear game state
+    clearStrokes()
+    clearMessages()
+    setGameState(null)
+    
+    // Close popup
+    onClose()
+    
+    // Navigate to home/lobby (not reload)
+    router.push('/')
+  }
 
   const sortedPlayers = [...allPlayers].sort((a, b) => b.score - a.score)
 
@@ -331,7 +360,7 @@ export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCur
                 {/* Action Buttons */}
                 <motion.div variants={itemVariants} className="flex gap-4 justify-center">
                   <Button
-                    onClick={onClose}
+                    onClick={handleBackToLobby}
                     variant="outline"
                     className="bg-white/10 border-white/20 text-white hover:bg-white/20 transition-all duration-300"
                   >
@@ -340,7 +369,7 @@ export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCur
                   </Button>
                   
                   <Button
-                    onClick={() => window.location.reload()}
+                    onClick={handlePlayAgain}
                     className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 animate-glow"
                   >
                     <RotateCcw className="w-4 h-4 mr-2" />

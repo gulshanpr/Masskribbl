@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useGameStore } from '@/lib/store'
@@ -8,13 +8,38 @@ import LoginForm from '@/components/auth/LoginForm'
 import QuickPlay from '@/components/lobby/QuickPlay'
 import CreateRoom from '@/components/lobby/CreateRoom'
 import JoinRoom from '@/components/lobby/JoinRoom'
-import { Palette, Sparkles, Users, Trophy, BarChart3 } from 'lucide-react'
+import { Palette, Sparkles, Users, Trophy, BarChart3, LogOut, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Toaster } from 'react-hot-toast'
 
 export default function Home() {
-  const { user } = useGameStore()
+  const { user, logout } = useGameStore()
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // Small delay to ensure hydration is complete
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  const handleLogout = () => {
+    logout()
+    // Force a page refresh to ensure clean state
+    window.location.reload()
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    )
+  }
 
   if (!user) {
     return (
@@ -91,14 +116,43 @@ export default function Home() {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-between mb-6">
-            <div></div>
-            <Button
-              onClick={() => router.push('/leaderboard')}
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold animate-glow"
-            >
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Leaderboard
-            </Button>
+            {/* User Profile Section */}
+            <div className="flex items-center gap-4">
+              <Avatar className="w-12 h-12 ring-2 ring-primary/40">
+                <AvatarImage src={user.avatar} />
+                <AvatarFallback className="bg-gradient-to-br from-purple-600 to-pink-600 text-white font-bold">
+                  {user.username.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="text-left">
+                <p className="text-lg font-semibold text-white">
+                  {user.username}
+                </p>
+                <p className="text-sm text-white/60">
+                  {user.email}
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => router.push('/leaderboard')}
+                className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold animate-glow"
+              >
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Leaderboard
+              </Button>
+              
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="bg-white/10 border-white/20 text-white hover:bg-red-500/20 hover:border-red-500/40 hover:text-red-200 transition-all duration-300"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-rainbow bg-clip-text text-transparent">
