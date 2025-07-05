@@ -18,20 +18,27 @@ export default function CreateRoom() {
   const { user } = useGameStore()
 
   const createRoom = async () => {
-    if (!user) return
+    if (!user) {
+      console.log('No user found')
+      return
+    }
 
+    console.log('Creating room with user:', user.id)
     setIsCreating(true)
     
     try {
       const socket = socketManager.connect()
+      console.log('Socket connected:', socket.connected)
       
       socket.emit('room:create', {
         hostId: user.id,
         maxPlayers,
         maxRounds
       })
+      console.log('Room create event emitted')
 
       socket.on('room:created', (roomCode: string) => {
+        console.log('Room created successfully:', roomCode)
         router.push(`/game/${roomCode}`)
       })
 
