@@ -52,7 +52,7 @@ class SocketManager {
       return this.socket
     }
 
-    this.socket = io(process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001', {
+    this.socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001'), {
       transports: ['websocket', 'polling'],
       timeout: 20000,
       forceNew: true,
