@@ -1,45 +1,17 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { useRouter } from 'next/navigation'
-import { useGameStore } from '@/lib/store'
-import LoginForm from '@/components/auth/LoginForm'
-import QuickPlay from '@/components/lobby/QuickPlay'
-import CreateRoom from '@/components/lobby/CreateRoom'
-import JoinRoom from '@/components/lobby/JoinRoom'
-import { Palette, Sparkles, Users, Trophy, BarChart3, LogOut, User } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Toaster } from 'react-hot-toast'
+import React from "react";
+import { motion } from "framer-motion";
+import { useGameStore } from "@/lib/store";
+import LoginForm from "@/components/auth/LoginForm";
+import QuickPlay from "@/components/lobby/QuickPlay";
+import CreateRoom from "@/components/lobby/CreateRoom";
+import JoinRoom from "@/components/lobby/JoinRoom";
+import { Palette, Sparkles, Users, Trophy } from "lucide-react";
+import { Toaster } from "react-hot-toast";
 
 export default function Home() {
-  const { user, logout } = useGameStore()
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    // Small delay to ensure hydration is complete
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 100)
-
-    return () => clearTimeout(timer)
-  }, [])
-
-  const handleLogout = () => {
-    logout()
-    // Force a page refresh to ensure clean state
-    window.location.reload()
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>
-    )
-  }
+  const { user } = useGameStore();
 
   if (!user) {
     return (
@@ -67,7 +39,7 @@ export default function Home() {
             >
               Draw, Guess, and Have Fun with Friends!
             </motion.p>
-            
+
             {/* Features */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
@@ -76,10 +48,10 @@ export default function Home() {
               className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12"
             >
               {[
-                { icon: Palette, text: 'Creative Drawing' },
-                { icon: Users, text: 'Multiplayer Fun' },
-                { icon: Sparkles, text: 'Real-time Play' },
-                { icon: Trophy, text: 'Compete & Win' }
+                { icon: Palette, text: "Creative Drawing" },
+                { icon: Users, text: "Multiplayer Fun" },
+                { icon: Sparkles, text: "Real-time Play" },
+                { icon: Trophy, text: "Compete & Win" },
               ].map((feature, index) => (
                 <motion.div
                   key={feature.text}
@@ -102,7 +74,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -159,7 +131,8 @@ export default function Home() {
             <span className="text-black">MassKribbl</span>
           </h1>
           <p className="text-lg text-white/80">
-            Welcome back, <span className="text-primary font-semibold">{user.username}</span>!
+            Welcome back,{" "}
+            <span className="text-primary font-semibold">{user.username}</span>!
           </p>
         </motion.div>
 
@@ -182,7 +155,8 @@ export default function Home() {
               Ready to Show Your Artistic Skills?
             </h3>
             <p className="text-white/60 mb-6">
-              Join thousands of players in the most fun drawing and guessing game online!
+              Join thousands of players in the most fun drawing and guessing
+              game online!
             </p>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
@@ -202,5 +176,5 @@ export default function Home() {
         </motion.div>
       </div>
     </div>
-  )
+  );
 }
