@@ -51,18 +51,21 @@ class SocketManager {
     if (this.socket?.connected) {
       return this.socket
     }
-
-    this.socket = io(process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001', {
+  
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 
+      (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001')
+  
+    this.socket = io(socketUrl, {
       transports: ['websocket', 'polling'],
       timeout: 20000,
       forceNew: true,
     })
-
+  
     this.socket.on('connect', () => {
       console.log('Connected to server')
       this.reconnectAttempts = 0
     })
-
+  
     this.socket.on('disconnect', () => {
       console.log('Disconnected from server')
       // Try to reconnect after a short delay
@@ -72,12 +75,12 @@ class SocketManager {
         }
       }, 1000)
     })
-
+  
     this.socket.on('connect_error', (error) => {
       console.error('Connection error:', error)
       this.handleReconnect()
     })
-
+  
     return this.socket
   }
 

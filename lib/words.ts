@@ -32,7 +32,7 @@ export const WORD_CATEGORIES = {
 export async function getRandomWords(count: number = 3, difficulty: 'easy' | 'medium' | 'hard' = 'medium'): Promise<string[]> {
   try {
     const words = await dbOperations.getRandomWords(count, undefined, difficulty)
-    return words.map(w => w.word)
+    return words.map((w: { word: string }) => w.word)
   } catch (error) {
     console.error('Failed to get words from database, using fallback:', error)
     // Fallback to local words if database fails
@@ -60,11 +60,10 @@ export function getWordHint(word: string, revealCount: number = 0): string {
   }
   
   const letters = word.split('')
-  const indicesToReveal = []
+  const indicesToReveal: number[] = []
   
   // Always reveal first letter
   indicesToReveal.push(0)
-  
   // Reveal random letters based on revealCount
   for (let i = 1; i < Math.min(revealCount, word.length); i++) {
     let randomIndex
@@ -75,6 +74,6 @@ export function getWordHint(word: string, revealCount: number = 0): string {
   }
   
   return letters.map((letter, index) => 
-    indicesToReveal.includes(index) ? letter : '_'
+    (indicesToReveal as number[]).includes(index) ? letter : '_'
   ).join('')
 }

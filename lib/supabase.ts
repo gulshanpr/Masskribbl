@@ -113,6 +113,38 @@ export type Database = {
           joined_at?: string
         }
       }
+      game_rounds: {
+        Row: {
+          id: string
+          game_id: string
+          round_number: number
+          drawer_id: string
+          word: string
+          started_at: string
+          ended_at: string | null
+          duration_seconds: number
+        }
+        Insert: {
+          id?: string
+          game_id: string
+          round_number: number
+          drawer_id: string
+          word: string
+          started_at?: string
+          ended_at?: string | null
+          duration_seconds?: number
+        }
+        Update: {
+          id?: string
+          game_id?: string
+          round_number?: number
+          drawer_id?: string
+          word?: string
+          started_at?: string
+          ended_at?: string | null
+          duration_seconds?: number
+        }
+      }
       words: {
         Row: {
           id: string
@@ -357,7 +389,7 @@ export const dbOperations = {
     return data
   },
 
-  async joinGame(gameId: string, playerId: string) {
+  async addGameParticipant(gameId: string, playerId: string) {
     const { data, error } = await supabase
       .from('game_participants')
       .insert({
@@ -376,6 +408,42 @@ export const dbOperations = {
       .from('game_sessions')
       .update(updates)
       .eq('id', id)
+      .select()
+      .single()
+    
+    if (error) throw error
+    return data
+  },
+
+  async createGameRound(roundData: Database['public']['Tables']['game_rounds']['Insert']) {
+    const { data, error } = await supabase
+      .from('game_rounds')
+      .insert(roundData)
+      .select()
+      .single()
+    
+    if (error) throw error
+    return data
+  },
+
+  async endGameRound(roundId: string) {
+    const { data, error } = await supabase
+      .from('game_rounds')
+      .update({ ended_at: new Date().toISOString() })
+      .eq('id', roundId)
+      .select()
+      .single()
+    
+    if (error) throw error
+    return data
+  },
+
+  async updateParticipantScore(gameId: string, playerId: string, score: number) {
+    const { data, error } = await supabase
+      .from('game_participants')
+      .update({ score })
+      .eq('game_id', gameId)
+      .eq('player_id', playerId)
       .select()
       .single()
     
@@ -435,20 +503,146 @@ export const dbOperations = {
     return data
   },
 
-  // Leaderboard operations
-  async getLeaderboard(period: 'daily' | 'weekly' | 'monthly' | 'all_time' = 'all_time', limit: number = 10) {
-    const { data, error } = await supabase
-      .from('leaderboards')
-      .select(`
-        *,
-        users (username, avatar_url)
-      `)
-      .eq('period', period)
-      .order('total_score', { ascending: false })
-      .limit(limit)
+  async clearDrawingStrokes(gameId: string, roundId: string) {
+    const { error } = await supabase
+      .from('drawing_strokes')
+      .delete()
+      .eq('game_id', gameId)
+      .eq('round_id', roundId)
     
     if (error) throw error
-    return data
+  },
+
+  // Leaderboard operations
+  async getLeaderboard(period: 'daily' | 'weekly' | 'monthly' | 'all_time' = 'all_time', limit: number = 10) {
+    try {
+      if (period === 'all_time') {
+        // Use the database function for all-time leaderboard
+        const { data, error } = await supabase
+          .rpc('get_all_time_leaderboard', { limit_count: limit })
+        
+        if (error) throw error
+        
+        return data?.map((item: any) => ({
+          player_id: item.player_id,
+          total_score: item.total_score,
+          games_played: item.games_played,
+          games_won: item.games_won,
+          average_score: parseFloat(item.average_score) || 0,
+          win_rate: parseFloat(item.win_rate) || 0,
+          users: {
+            username: item.username,
+            avatar_url: item.avatar_url
+          }
+        })) || []
+      } else {
+        // For time-based periods, we need to query game data directly with proper date filtering
+        let startDate = new Date()
+        
+        switch (period) {
+          case 'daily':
+            // Set to start of today (midnight)
+            startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
+            break
+          case 'weekly':
+            // Set to start of current week (Sunday)
+            const dayOfWeek = startDate.getDay()
+            startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() - dayOfWeek)
+            break
+          case 'monthly':
+            // Set to start of current month
+            startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
+            break
+        }
+        
+        // Get game sessions for the period
+        console.log(`Fetching games for ${period} from ${startDate.toISOString()}`)
+        const { data: gameSessions, error: gameError } = await supabase
+          .from('game_sessions')
+          .select('id, updated_at')
+          .eq('status', 'finished')
+          .gte('updated_at', startDate.toISOString())
+        
+        if (gameError) throw gameError
+        
+        console.log(`Found ${gameSessions?.length || 0} games for ${period}`)
+        console.log('Game sessions:', gameSessions?.map(gs => ({
+          id: gs.id,
+          updated_at: gs.updated_at,
+          date: new Date(gs.updated_at).toLocaleDateString()
+        })))
+        
+        if (!gameSessions || gameSessions.length === 0) {
+          return []
+        }
+        
+        const gameIds = gameSessions.map(gs => gs.id)
+        
+        // Get participant data for these games
+        const { data: participants, error: participantError } = await supabase
+          .from('game_participants')
+          .select(`
+            game_id,
+            player_id,
+            score,
+            users (username, avatar_url)
+          `)
+          .in('game_id', gameIds)
+        
+        if (participantError) throw participantError
+        
+        console.log(`Found ${participants?.length || 0} participants for ${period}`)
+        console.log('Participant data:', participants)
+        
+        // Calculate leaderboard data
+        const playerStats = new Map()
+        
+        participants?.forEach((participant: any) => {
+          const playerId = participant.player_id
+          if (!playerStats.has(playerId)) {
+            playerStats.set(playerId, {
+              player_id: playerId,
+              total_score: 0,
+              games_played: new Set(),
+              games_won: new Set(),
+              users: participant.users
+            })
+          }
+          
+          const stats = playerStats.get(playerId)
+          stats.total_score += participant.score || 0
+          stats.games_played.add(participant.game_id)
+          
+          // Check if this player won the game (highest score in the game)
+          const gameParticipants = participants.filter((p: any) => p.game_id === participant.game_id)
+          const maxScore = Math.max(...gameParticipants.map((p: any) => p.score || 0))
+          if (participant.score === maxScore) {
+            stats.games_won.add(participant.game_id)
+          }
+        })
+        
+        // Convert to array and calculate final stats
+        const leaderboardData = Array.from(playerStats.values()).map((stats: any) => ({
+          player_id: stats.player_id,
+          total_score: stats.total_score,
+          games_played: stats.games_played.size,
+          games_won: stats.games_won.size,
+          average_score: stats.games_played.size > 0 ? stats.total_score / stats.games_played.size : 0,
+          win_rate: stats.games_played.size > 0 ? (stats.games_won.size / stats.games_played.size * 100) : 0,
+          users: stats.users
+        }))
+        
+        // Sort by total score and return top players (only those who played games)
+        return leaderboardData
+          .filter(player => player.games_played > 0)
+          .sort((a, b) => b.total_score - a.total_score)
+          .slice(0, limit)
+      }
+    } catch (error) {
+      console.error('Failed to fetch leaderboard:', error)
+      // Return empty array on error
+      return []
+    }
   },
 
   // Active games
@@ -460,5 +654,46 @@ export const dbOperations = {
     
     if (error) throw error
     return data
+  },
+
+  // Get game count for a specific period
+  async getGameCountForPeriod(period: 'daily' | 'weekly' | 'monthly' | 'all_time') {
+    try {
+      let startDate = new Date()
+      
+      switch (period) {
+        case 'daily':
+          startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
+          break
+        case 'weekly':
+          const dayOfWeek = startDate.getDay()
+          startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() - dayOfWeek)
+          break
+        case 'monthly':
+          startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
+          break
+        case 'all_time':
+          // For all-time, we don't need date filtering
+          const { count, error } = await supabase
+            .from('game_sessions')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'finished')
+          
+          if (error) throw error
+          return count || 0
+      }
+      
+      const { count, error } = await supabase
+        .from('game_sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'finished')
+        .gte('updated_at', startDate.toISOString())
+      
+      if (error) throw error
+      return count || 0
+    } catch (error) {
+      console.error('Failed to get game count:', error)
+      return 0
+    }
   }
 }

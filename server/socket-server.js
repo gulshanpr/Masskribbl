@@ -379,10 +379,14 @@ io.on('connection', (socket) => {
   console.log('User connected:', socket.id)
   
   socket.on('room:create', async ({ hostId, maxPlayers, maxRounds }) => {
+    console.log('Received room:create event:', { hostId, maxPlayers, maxRounds })
     try {
+      console.log('Creating room...')
       const room = await createRoom(hostId, maxPlayers, maxRounds)
+      console.log('Room created successfully:', room.code)
       socket.emit('room:created', room.code)
     } catch (error) {
+      console.error('Failed to create room:', error)
       socket.emit('error', 'Failed to create room')
     }
   })

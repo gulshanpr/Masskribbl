@@ -12,6 +12,7 @@
     "@massalabs/wallet-provider": "^3.2.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@supabase/supabase-js": "^2.39.0",
+    "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^11.0.0",
@@ -23,7 +24,7 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^3.3.1",
-    "zustand": "^4.4.7"
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
