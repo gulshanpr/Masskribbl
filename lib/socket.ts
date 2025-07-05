@@ -53,7 +53,7 @@ class SocketManager {
     }
   
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 
-      (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001')
+      (process.env.NODE_ENV === 'production' ? 'masskribbl-production.up.railway.app' : 'http://localhost:3001')
   
     this.socket = io(socketUrl, {
       transports: ['websocket', 'polling'],
