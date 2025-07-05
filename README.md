@@ -1,4 +1,4 @@
-<!-- # MassKribbl - Real-time Multiplayer Drawing Game
+# MassKribbl - Real-time Multiplayer Drawing Game
 
 A production-grade, real-time multiplayer "Draw & Guess" web game built with Next.js, TypeScript, Socket.IO, and Supabase. Features a stunning, colorful, modern UI designed to attract and retain users.
 
@@ -157,12 +157,12 @@ server/
 
 ## 🚀 Deployment
 
-### Frontend (Vercel/Netlify)
+### Frontend
 ```bash
 npm run build
 ```
 
-### Socket.IO Server (Railway/Heroku)
+### Socket.IO Server 
 ```bash
 cd server
 npm start
@@ -178,7 +178,7 @@ SOCKET_SERVER_URL=your_production_socket_server_url
 
 ## 🎨 Customization
 
-### Adding New Words
+<!-- ### Adding New Words
 Edit `lib/words.ts` or `server/words.js`:
 ```javascript
 const WORD_CATEGORIES = {
@@ -187,9 +187,9 @@ const WORD_CATEGORIES = {
   // Or add to existing categories
   animals: [...existingAnimals, 'newAnimal']
 }
-```
+``` -->
 
-### Styling
+<!-- ### Styling
 - Colors: Modify CSS variables in `app/globals.css`
 - Animations: Customize Framer Motion variants in components
 - Layout: Adjust Tailwind classes for responsive design
@@ -197,7 +197,7 @@ const WORD_CATEGORIES = {
 ### Game Rules
 - Scoring: Modify point calculations in `server/socket-server.js`
 - Timing: Adjust round and selection timers
-- Player limits: Change min/max players per room
+- Player limits: Change min/max players per room -->
 
 ## 🤝 Contributing
 
@@ -207,16 +207,7 @@ const WORD_CATEGORIES = {
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Inspired by Skribbl.io and Gartic.io
-- UI/UX inspiration from Monument Valley and Alto's Adventure
-- Built with amazing open-source tools and libraries
 
 ---
 
-**Ready to draw and guess? Start playing MassKribbl now!** 🎨✨ -->
+**Ready to draw and guess? Start playing MassKribbl now!** 🎨✨
