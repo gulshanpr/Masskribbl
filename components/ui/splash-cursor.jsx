@@ -1258,3 +1258,4 @@ function SplashCursor({
 }
 
 export { SplashCursor };
+
