@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SplashCursorWrapper } from "@/components/ui/splash-cursor-wrapper";
@@ -12,6 +12,14 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#7c3aed"
+};
 
 export const metadata: Metadata = {
   title: "MassKribbl - Draw & Guess Multiplayer Game",
@@ -36,9 +44,7 @@ export const metadata: Metadata = {
     title: "MassKribbl - Draw & Guess Multiplayer Game",
     description: "The most fun real-time multiplayer drawing and guessing game. Play with friends or join random players worldwide!",
     images: ["/og-image.png"]
-  },
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
-  themeColor: "#7c3aed"
+  }
 };
 
 export default function RootLayout({
