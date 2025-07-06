@@ -363,6 +363,13 @@ function broadcastGameState(room) {
     scores: room.scores
   }
   
+  console.log('Broadcasting game state:', {
+    roomCode: room.code,
+    playerCount: room.players.length,
+    status: room.status,
+    players: room.players.map(p => p.username)
+  })
+  
   io.to(room.code).emit('game:state', gameState)
 }
 
@@ -458,20 +465,25 @@ io.on('connection', (socket) => {
   })
   
   socket.on('room:join', async ({ roomCode, player }) => {
+    console.log('Received room:join event:', { roomCode, player: player.username })
     try {
       const room = await joinRoom(roomCode, player)
       if (!room) {
+        console.log('Room not found or full:', roomCode)
         socket.emit('error', 'Room not found or full')
         return
       }
       
+      console.log('Successfully joined room:', roomCode)
       socket.join(roomCode)
       socket.userId = player.id
       socket.roomCode = roomCode
       socket.emit('room:joined')
       
+      console.log('Broadcasting game state to room:', roomCode)
       broadcastGameState(room)
     } catch (error) {
+      console.error('Failed to join room:', error)
       socket.emit('error', 'Failed to join room')
     }
   })

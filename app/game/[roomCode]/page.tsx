@@ -40,13 +40,71 @@ export default function GameRoom() {
       return
     }
 
+    // First check if the room exists
+    const checkRoom = async () => {
+      try {
+        const response = await fetch(`/api/room/${roomCode}`)
+        const data = await response.json()
+        
+        if (!data.exists) {
+          console.error('Room does not exist:', roomCode)
+          toast.error('Room not found')
+          router.push('/')
+          return
+        }
+        
+        console.log('Room exists:', data.room)
+      } catch (error) {
+        console.error('Failed to check room:', error)
+      }
+    }
+    
+    checkRoom()
+
     const socket = socketManager.connect()
     
+    // Set a timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      console.error('Game state timeout - no response from server')
+      setIsConnecting(false)
+      toast.error('Failed to connect to game room')
+      
+      // If we're the host, try to create a minimal game state
+      if (user && roomCode) {
+        console.log('Creating fallback game state for host')
+        setGameState({
+          roomCode,
+          hostId: user.id,
+          players: [{
+            id: user.id,
+            username: user.username,
+            avatar: user.avatar,
+            score: 0,
+            isDrawing: false,
+            isReady: false
+          }],
+          currentDrawer: null,
+          currentWord: null,
+          wordChoices: null,
+          round: 0,
+          maxRounds: 3,
+          timeLeft: 0,
+          status: 'waiting',
+          scores: { [user.id]: 0 }
+        })
+      }
+    }, 10000) // 10 second timeout
+    
     socket.on('connect', () => {
+      console.log('Connected to socket server')
       setIsConnected(true)
       setIsConnecting(false)
       
       // Join the room
+      console.log('Joining room:', roomCode)
+      console.log('Socket connected state:', socket.connected)
+      console.log('User data:', { id: user.id, username: user.username })
+      
       socket.emit('room:join', {
         roomCode,
         player: {
@@ -57,11 +115,33 @@ export default function GameRoom() {
       })
     })
 
+    // Retry joining if we don't get a response
+    const joinRetry = setTimeout(() => {
+      if (!gameState) {
+        console.log('Retrying room join...')
+        socket.emit('room:join', {
+          roomCode,
+          player: {
+            id: user.id,
+            username: user.username,
+            avatar: user.avatar
+          }
+        })
+      }
+    }, 3000) // Retry after 3 seconds
+
+    socket.on('room:joined', () => {
+      console.log('Successfully joined room:', roomCode)
+      // The server should send game:state after joining
+    })
+
     socket.on('disconnect', () => {
       setIsConnected(false)
     })
 
     socket.on('game:state', (state) => {
+      console.log('Received game state:', state)
+      clearTimeout(timeout) // Clear the timeout
       setGameState(state)
     })
 
@@ -79,6 +159,7 @@ export default function GameRoom() {
     })
 
     socket.on('error', (error) => {
+      console.error('Socket error:', error)
       toast.error(error)
       if (error.includes('not found')) {
         router.push('/')
@@ -86,6 +167,8 @@ export default function GameRoom() {
     })
 
     return () => {
+      clearTimeout(timeout)
+      clearTimeout(joinRetry)
       socketManager.disconnect()
       clearStrokes()
       clearMessages()
@@ -137,11 +220,20 @@ export default function GameRoom() {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="glass border-destructive/40">
           <CardContent className="p-6 text-center">
-            <p className="text-white mb-4">Failed to join game room</p>
-            <Button onClick={() => router.push('/')} variant="outline">
-              <Home className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
+            <p className="text-white mb-4">
+              {isConnecting ? 'Connecting to game room...' : 'Failed to join game room'}
+            </p>
+            {!isConnecting && (
+              <div className="space-y-2">
+                <p className="text-white/60 text-sm">
+                  Room code: {roomCode}
+                </p>
+                <Button onClick={() => router.push('/')} variant="outline">
+                  <Home className="w-4 h-4 mr-2" />
+                  Back to Home
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
