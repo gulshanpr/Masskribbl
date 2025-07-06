@@ -12,6 +12,7 @@ import { Palette, Sparkles, Users, Trophy, BarChart3, LogOut, User } from 'lucid
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Toaster } from 'react-hot-toast'
+import ConnectionStatus from '@/components/ui/ConnectionStatus'
 
 export default function Home() {
   const { user, logout } = useGameStore()
@@ -45,6 +46,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Toaster position="top-center" />
+        <ConnectionStatus />
         <div className="w-full max-w-6xl">
           {/* Hero Section */}
           <motion.div
@@ -108,6 +110,7 @@ export default function Home() {
   return (
     <div className="min-h-screen p-4">
       <Toaster position="top-center" />
+      <ConnectionStatus />
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div

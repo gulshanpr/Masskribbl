@@ -47,18 +47,26 @@ class SocketManager {
   private reconnectAttempts = 0
   private maxReconnectAttempts = 5
 
-  connect(): Socket {
+    connect(): Socket {
     if (this.socket?.connected) {
       return this.socket
     }
   
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 
-      (process.env.NODE_ENV === 'production' ? 'masskribbl-production.up.railway.app' : 'http://localhost:3001')
+      (process.env.NODE_ENV === 'production' ? 'https://masskribbl-production.up.railway.app' : 'http://localhost:3001')
+    
+    console.log('Connecting to socket URL:', socketUrl)
+    console.log('Environment:', process.env.NODE_ENV)
+    console.log('NEXT_PUBLIC_SOCKET_URL:', process.env.NEXT_PUBLIC_SOCKET_URL)
   
     this.socket = io(socketUrl, {
       transports: ['websocket', 'polling'],
-      timeout: 20000,
+      timeout: 30000,
       forceNew: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
     })
   
     this.socket.on('connect', () => {
@@ -66,8 +74,8 @@ class SocketManager {
       this.reconnectAttempts = 0
     })
   
-    this.socket.on('disconnect', () => {
-      console.log('Disconnected from server')
+    this.socket.on('disconnect', (reason) => {
+      console.log('Disconnected from server:', reason)
       // Try to reconnect after a short delay
       setTimeout(() => {
         if (this.socket) {
@@ -78,6 +86,7 @@ class SocketManager {
   
     this.socket.on('connect_error', (error) => {
       console.error('Connection error:', error)
+      console.error('Error message:', error.message)
       this.handleReconnect()
     })
   

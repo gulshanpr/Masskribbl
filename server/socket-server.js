@@ -2,19 +2,50 @@ const { createServer } = require('http')
 const { Server } = require('socket.io')
 const { dbOperations } = require('./supabase')
 
-const httpServer = createServer()
+const httpServer = createServer((req, res) => {
+  // Add CORS headers for all requests
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+  
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200)
+    res.end()
+    return
+  }
+  
+  // Health check endpoint
+  if (req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ 
+      status: 'ok', 
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      env: process.env.NODE_ENV,
+      supabaseUrl: !!process.env.SUPABASE_URL,
+      supabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+    }))
+    return
+  }
+  
+  // Default response
+  res.writeHead(404, { 'Content-Type': 'text/plain' })
+  res.end('Not Found')
+})
 const io = new Server(httpServer, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ['https://masskribbl.vercel.app', 'https://*.vercel.app']
+      ? ['https://masskribbl.vercel.app', 'https://*.vercel.app', 'https://*.vercel.app/*', 'https://masskribbl-git-main-samyakjain.vercel.app', 'https://masskribbl-samyakjain.vercel.app']
       : ['http://localhost:3000'],
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   },
   transports: ['websocket', 'polling'],
   pingTimeout: 60000,
-  pingInterval: 25000
+  pingInterval: 25000,
+  allowEIO3: true,
+  allowUpgrades: true
 })
 
 // Game state management (in-memory for real-time features)
@@ -27,6 +58,14 @@ async function createRoom(hostId, maxPlayers = 8, maxRounds = 3) {
   const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase()
   
   try {
+    console.log('Creating game session with data:', {
+      room_code: roomCode,
+      host_id: hostId,
+      max_players: maxPlayers,
+      max_rounds: maxRounds,
+      status: 'waiting'
+    })
+    
     // Create game session in database
     const gameSession = await dbOperations.createGameSession({
       room_code: roomCode,
@@ -35,6 +74,8 @@ async function createRoom(hostId, maxPlayers = 8, maxRounds = 3) {
       max_rounds: maxRounds,
       status: 'waiting'
     })
+
+    console.log('Game session created:', gameSession)
 
     const room = {
       code: roomCode,
@@ -60,6 +101,12 @@ async function createRoom(hostId, maxPlayers = 8, maxRounds = 3) {
     return room
   } catch (error) {
     console.error('Failed to create game session in database:', error)
+    console.error('Database error details:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    })
     throw error
   }
 }
@@ -384,6 +431,12 @@ function addToMatchmaking(player) {
 // Socket connection handling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id)
+  console.log('Connection details:', {
+    transport: socket.conn.transport.name,
+    remoteAddress: socket.handshake.address,
+    userAgent: socket.handshake.headers['user-agent'],
+    origin: socket.handshake.headers.origin
+  })
   
   socket.on('room:create', async ({ hostId, maxPlayers, maxRounds }) => {
     console.log('Received room:create event:', { hostId, maxPlayers, maxRounds })
@@ -394,6 +447,12 @@ io.on('connection', (socket) => {
       socket.emit('room:created', room.code)
     } catch (error) {
       console.error('Failed to create room:', error)
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      })
       socket.emit('error', 'Failed to create room')
     }
   })
@@ -650,7 +709,7 @@ setInterval(() => {
   }
 }, 10000) // Check every 10 seconds
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 8080
 
 httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`Socket.IO server running on port ${PORT}`)
@@ -658,4 +717,5 @@ httpServer.listen(PORT, '0.0.0.0', () => {
   console.log('- SUPABASE_URL:', !!process.env.SUPABASE_URL)
   console.log('- SUPABASE_SERVICE_ROLE_KEY:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
   console.log('- NODE_ENV:', process.env.NODE_ENV)
+  console.log('- Health check available at: http://localhost:${PORT}/health')
 })
