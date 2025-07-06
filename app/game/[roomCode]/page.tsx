@@ -93,7 +93,7 @@ export default function GameRoom() {
           scores: { [user.id]: 0 }
         })
       }
-    }, 10000) // 10 second timeout
+    }, 5000) // 5 second timeout (reduced from 10)
     
     socket.on('connect', () => {
       console.log('Connected to socket server')
@@ -113,6 +113,13 @@ export default function GameRoom() {
           avatar: user.avatar
         }
       })
+      
+      // Test ping to verify socket communication
+      socket.emit('ping', { message: 'test' })
+    })
+
+    socket.on('pong', (data) => {
+      console.log('Received pong:', data)
     })
 
     // Retry joining if we don't get a response
@@ -133,6 +140,14 @@ export default function GameRoom() {
     socket.on('room:joined', () => {
       console.log('Successfully joined room:', roomCode)
       // The server should send game:state after joining
+      
+      // Request game state manually if it doesn't arrive
+      setTimeout(() => {
+        if (!gameState) {
+          console.log('Requesting game state manually...')
+          socket.emit('game:requestState', { roomCode })
+        }
+      }, 2000)
     })
 
     socket.on('disconnect', () => {
@@ -142,8 +157,18 @@ export default function GameRoom() {
     socket.on('game:state', (state) => {
       console.log('Received game state:', state)
       clearTimeout(timeout) // Clear the timeout
+      clearTimeout(joinRetry) // Clear the retry timeout
+      console.log('Setting game state...')
       setGameState(state)
+      console.log('Game state set successfully')
     })
+
+    // Debug: Log all socket events
+    const originalEmit = socket.emit
+    socket.emit = function(event: string, ...args: any[]) {
+      console.log('Socket emitting:', event, args)
+      return originalEmit.call(this, event, ...args)
+    }
 
     socket.on('game:roundStart', () => {
       clearStrokes()
@@ -175,6 +200,15 @@ export default function GameRoom() {
       setGameState(null)
     }
   }, [user, roomCode, router, setIsConnected, setGameState, clearStrokes, clearMessages])
+
+  // Debug: Monitor game state changes
+  useEffect(() => {
+    console.log('Game state changed:', gameState)
+    if (gameState) {
+      console.log('Game state is now available, should stop loading')
+      setIsConnecting(false)
+    }
+  }, [gameState])
 
   const copyRoomCode = () => {
     navigator.clipboard.writeText(roomCode)
@@ -210,6 +244,9 @@ export default function GameRoom() {
         >
           <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
           <p className="text-white text-lg">Connecting to game...</p>
+          <p className="text-white/60 text-sm mt-2">
+            Room: {roomCode} | Game State: {gameState ? 'Loaded' : 'Loading...'}
+          </p>
         </motion.div>
       </div>
     )

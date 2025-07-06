@@ -370,7 +370,19 @@ function broadcastGameState(room) {
     players: room.players.map(p => p.username)
   })
   
+  // Get all sockets in the room
+  const roomSockets = io.sockets.adapter.rooms.get(room.code)
+  console.log('Sockets in room:', roomSockets ? Array.from(roomSockets) : 'No sockets')
+  
   io.to(room.code).emit('game:state', gameState)
+  
+  // Also emit directly to the socket that just joined
+  const sockets = Array.from(io.sockets.sockets.values())
+  const targetSocket = sockets.find(s => s.roomCode === room.code && s.userId === room.hostId)
+  if (targetSocket) {
+    console.log('Emitting game state directly to socket:', targetSocket.id)
+    targetSocket.emit('game:state', gameState)
+  }
 }
 
 function getWordHint(word, revealCount = 0) {
@@ -480,8 +492,12 @@ io.on('connection', (socket) => {
       socket.roomCode = roomCode
       socket.emit('room:joined')
       
-      console.log('Broadcasting game state to room:', roomCode)
-      broadcastGameState(room)
+      // Wait a bit for the socket to be properly joined to the room
+      setTimeout(() => {
+        console.log('Broadcasting game state to room:', roomCode)
+        console.log('Socket rooms:', Array.from(socket.rooms))
+        broadcastGameState(room)
+      }, 100)
     } catch (error) {
       console.error('Failed to join room:', error)
       socket.emit('error', 'Failed to join room')
@@ -637,6 +653,22 @@ io.on('connection', (socket) => {
     addToMatchmaking(player)
   })
   
+  socket.on('ping', (data) => {
+    console.log('Received ping from socket:', socket.id, data)
+    socket.emit('pong', { message: 'pong', timestamp: Date.now() })
+  })
+
+  socket.on('game:requestState', ({ roomCode }) => {
+    console.log('Received game state request for room:', roomCode)
+    const room = rooms.get(roomCode)
+    if (room) {
+      console.log('Sending game state to requesting socket')
+      broadcastGameState(room)
+    } else {
+      console.log('Room not found for state request:', roomCode)
+    }
+  })
+
   socket.on('disconnect', async () => {
     console.log('User disconnected:', socket.id)
     
