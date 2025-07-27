@@ -55,9 +55,9 @@ class SocketManager {
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 
       (process.env.NODE_ENV === 'production' ? 'https://masskribbl-production.up.railway.app' : 'http://localhost:3001')
     
-    console.log('Connecting to socket URL:', socketUrl)
-    console.log('Environment:', process.env.NODE_ENV)
-    console.log('NEXT_PUBLIC_SOCKET_URL:', process.env.NEXT_PUBLIC_SOCKET_URL)
+   // console.log('Connecting to socket URL:', socketUrl)
+   // console.log('Environment:', process.env.NODE_ENV)
+   // console.log('NEXT_PUBLIC_SOCKET_URL:', process.env.NEXT_PUBLIC_SOCKET_URL)
   
     this.socket = io(socketUrl, {
       transports: ['websocket', 'polling'],
