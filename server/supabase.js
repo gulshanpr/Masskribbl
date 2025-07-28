@@ -19,7 +19,7 @@ const dbOperations = {
       .insert(gameData)
       .select()
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -31,7 +31,7 @@ const dbOperations = {
       .eq('id', id)
       .select()
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -48,7 +48,7 @@ const dbOperations = {
       `)
       .eq('room_code', roomCode)
       .single()
-    
+
     if (error && error.code !== 'PGRST116') throw error
     return data
   },
@@ -63,7 +63,7 @@ const dbOperations = {
       })
       .select()
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -76,7 +76,7 @@ const dbOperations = {
       .eq('player_id', playerId)
       .select()
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -87,7 +87,7 @@ const dbOperations = {
       .delete()
       .eq('game_id', gameId)
       .eq('player_id', playerId)
-    
+
     if (error) throw error
   },
 
@@ -98,7 +98,7 @@ const dbOperations = {
       .insert(roundData)
       .select()
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -110,7 +110,7 @@ const dbOperations = {
       .eq('id', roundId)
       .select()
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -122,7 +122,7 @@ const dbOperations = {
       .insert(messageData)
       .select()
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -134,7 +134,7 @@ const dbOperations = {
       .insert(strokeData)
       .select()
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -145,7 +145,7 @@ const dbOperations = {
       .delete()
       .eq('game_id', gameId)
       .eq('round_id', roundId)
-    
+
     if (error) throw error
   },
 
@@ -156,7 +156,7 @@ const dbOperations = {
       word_category: category,
       word_difficulty: difficulty
     })
-    
+
     if (error) throw error
     return data
   },
@@ -168,7 +168,7 @@ const dbOperations = {
       score_gained: scoreGained,
       won
     })
-    
+
     if (error) throw error
   },
 
@@ -179,7 +179,7 @@ const dbOperations = {
       .select('*')
       .eq('id', userId)
       .single()
-    
+
     if (error) throw error
     return data
   }
