@@ -7,28 +7,35 @@ import {
 } from '@massalabs/massa-as-sdk';
 import { Args, stringToBytes, bytesToString } from '@massalabs/as-types';
 
-export function createGame(args: StaticArray<u8>): StaticArray<u8> {
+export function createGame(args: StaticArray<u8>): StaticArray<u8> {\
+  // check if tokens received
   const receivedAmount = transferredCoins();
   assert(receivedAmount > 0, 'No MAS tokens were sent.');
 
+  // deserializing the args
   const deserializedArgs = new Args(args);
   const noOfRounds = deserializedArgs.nextU8().expect('Invalid number of rounds');
   const roundTime = deserializedArgs.nextU8().expect('Invalid round time');
   const totalPlayers = deserializedArgs.nextU8().expect('Invalid total players');
   const potPool = deserializedArgs.nextU64().expect('Invalid pot pool');
 
+  // validations for the number of players and round time
   assert(totalPlayers >= 2 && totalPlayers <= 10, 'Players must be between 2 and 10');
   assert(roundTime >= <u8>60 && roundTime <= <u8>1200, 'Round time must be between 60 and 1200 seconds');
 
+  // validations for if host has sent there part of the pot pool
   const hostShare = potPool / totalPlayers;
   assert(receivedAmount >= hostShare, 'Insufficient MAS tokens sent by host');
 
+  // generating the room id
   const roomId = generateGameId();
 
+  // initializing the players array with the host
   const playersArray = [Context.caller()];
   const players = new Args().addSerializableObjectArray(playersArray).serialize();
   Storage.set(stringToBytes(roomId + "_players"), players);
 
+  // initializing the game details
   const gameDetails = new Args()
     .add(noOfRounds)
     .add(roundTime)
@@ -37,10 +44,14 @@ export function createGame(args: StaticArray<u8>): StaticArray<u8> {
     .add(0)
     .add(0)
     .serialize();
+
+  // setting the game details in the storage
   Storage.set(stringToBytes(roomId + "_details"), gameDetails);
 
+  // emitting the event for the game creation
   generateEvent(`Game created with Room ID: ${roomId}`);
 
+  // serializing the result with room id, no of rounds, round time, total players, pot pool
   const result = new Args().add(roomId).add(noOfRounds).add(roundTime).add(totalPlayers).add(potPool).serialize();
   return result;
 }
