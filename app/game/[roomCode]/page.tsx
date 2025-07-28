@@ -243,8 +243,8 @@ export default function GameRoom() {
           className="text-center"
         >
           <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-white text-lg">Connecting to game...</p>
-          <p className="text-white/60 text-sm mt-2">
+          <p className="text-black text-lg">Connecting to game...</p>
+          <p className="text-black text-sm mt-2">
             Room: {roomCode} | Game State: {gameState ? 'Loaded' : 'Loading...'}
           </p>
         </motion.div>
@@ -262,7 +262,7 @@ export default function GameRoom() {
             </p>
             {!isConnecting && (
               <div className="space-y-2">
-                <p className="text-white/60 text-sm">
+                <p className="text-black text-sm">
                   Room code: {roomCode}
                 </p>
                 <Button onClick={() => router.push('/')} variant="outline">
@@ -311,8 +311,8 @@ export default function GameRoom() {
               <Home className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-white">Room {roomCode}</h1>
-              <p className="text-white/60 text-sm">
+              <h1 className="text-2xl font-bold text-black">Room {roomCode}</h1>
+              <p className="text-gray-600 text-sm">
                 {gameState.status === 'waiting' ? 'Waiting for players...' :
                  gameState.status === 'choosing' ? 'Choosing word...' :
                  gameState.status === 'drawing' ? 'Drawing in progress' :

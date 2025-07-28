@@ -45,11 +45,11 @@ export default function DrawingTools() {
     <motion.div
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      className="glass rounded-lg p-4 space-y-4"
+      className="bg-white/95 border border-gray-200 rounded-lg p-4 space-y-4 shadow-lg"
     >
       {/* Tool Selection */}
       <div className="space-y-2">
-        <h3 className="text-sm font-medium text-white">Tools</h3>
+        <h3 className="text-sm font-medium text-black" style={{ color: '#1A202C' }}>Tools</h3>
         <div className="grid grid-cols-2 gap-2">
           {tools.map((tool) => (
             <Button
@@ -69,7 +69,7 @@ export default function DrawingTools() {
 
       {/* Brush Size */}
       <div className="space-y-2">
-        <h3 className="text-sm font-medium text-white">Size</h3>
+        <h3 className="text-sm font-medium text-black" style={{ color: '#1A202C' }}>Size</h3>
         <div className="grid grid-cols-3 gap-2">
           {BRUSH_SIZES.map((size) => (
             <Button
@@ -88,7 +88,7 @@ export default function DrawingTools() {
       {/* Color Palette */}
       {currentTool !== 'eraser' && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2">
+          <h3 className="text-sm font-medium text-black flex items-center gap-2" style={{ color: '#1A202C' }}>
             <Palette className="w-4 h-4" />
             Colors
           </h3>
@@ -112,10 +112,10 @@ export default function DrawingTools() {
       )}
 
       {/* Current Selection Preview */}
-      <div className="pt-2 border-t border-white/20">
-        <div className="flex items-center gap-2 text-sm text-white">
+      <div className="pt-2 border-t border-gray-300">
+        <div className="flex items-center gap-2 text-sm text-black" style={{ color: '#1A202C' }}>
           <div
-            className="rounded-full border border-white/40 flex-shrink-0"
+            className="rounded-full border border-gray-400 flex-shrink-0"
             style={{
               backgroundColor: currentTool === 'eraser' ? '#ff6b6b' : brushColor,
               width: `${Math.max(brushSize / 2, 8)}px`,
@@ -126,7 +126,7 @@ export default function DrawingTools() {
             <span className="font-medium">
               {tools.find(t => t.id === currentTool)?.label || 'Brush'}
             </span>
-            <span className="text-xs text-white/60">
+            <span className="text-xs text-gray-600" style={{ color: '#4A5568' }}>
               {brushSize}px
             </span>
           </div>
