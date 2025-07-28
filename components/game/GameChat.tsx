@@ -104,7 +104,7 @@ export default function GameChat() {
           >
             {/* Header */}
             <div className="p-4 border-b border-white/20 flex items-center justify-between">
-              <h3 className="font-semibold text-white flex items-center gap-2">
+              <h3 className="font-semibold text-black flex items-center gap-2">
                 <MessageCircle className="w-5 h-5" />
                 Chat
               </h3>
@@ -137,7 +137,7 @@ export default function GameChat() {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-white truncate">
+                        <span className="text-sm font-medium text-black truncate">
                           {msg.username}
                         </span>
                         {msg.isCorrect && (
@@ -148,7 +148,7 @@ export default function GameChat() {
                       </div>
                       <p className={`
                         text-sm break-words
-                        ${msg.isCorrect ? 'text-green-200' : 'text-white/80'}
+                        ${msg.isCorrect ? 'text-green-200' : 'text-gray-800'}
                       `}>
                         {msg.message}
                       </p>
@@ -172,7 +172,7 @@ export default function GameChat() {
                       ? "Guess the word..." 
                       : "Type a message..."
                   }
-                  className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                  className="flex-1 bg-white/10 border-white/20 text-black placeholder:text-black"
                   maxLength={100}
                 />
                 <Button

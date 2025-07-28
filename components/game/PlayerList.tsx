@@ -16,12 +16,12 @@ export default function PlayerList() {
 
   return (
     <motion.div
-      initial={{ y: -50, opacity: 0 }}
+      initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="glass rounded-lg p-4"
+      className="bg-white/95 border border-gray-200 rounded-lg p-4 shadow-lg"
     >
-      <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
-        <Crown className="w-5 h-5 text-yellow-400" />
+      <h3 className="font-semibold text-black mb-4 flex items-center gap-2" style={{ color: '#1A202C' }}>
+        <Crown className="w-5 h-5 text-yellow-500" />
         Players ({gameState.players.length})
       </h3>
       
@@ -34,7 +34,7 @@ export default function PlayerList() {
             transition={{ delay: index * 0.1 }}
             className={`
               flex items-center gap-3 p-3 rounded-lg transition-all
-              ${player.id === user?.id ? 'bg-primary/20 border border-primary/40' : 'bg-white/5'}
+              ${player.id === user?.id ? 'bg-primary/20 border border-primary/40' : 'bg-white/80'}
               ${player.isDrawing ? 'ring-2 ring-yellow-400' : ''}
             `}
           >
@@ -61,7 +61,7 @@ export default function PlayerList() {
             
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-white truncate">
+                <span className="font-medium text-black truncate" style={{ color: '#1A202C' }}>
                   {player.username}
                 </span>
                 {player.id === user?.id && (
@@ -69,7 +69,7 @@ export default function PlayerList() {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-white/60">
+                <span className="text-sm text-gray-600" style={{ color: '#4A5568' }}>
                   {player.score} points
                 </span>
                 {player.isDrawing && (
@@ -81,7 +81,7 @@ export default function PlayerList() {
             </div>
             
             <div className="text-right">
-              <div className="text-lg font-bold text-white">
+              <div className="text-lg font-bold text-black" style={{ color: '#1A202C' }}>
                 #{index + 1}
               </div>
             </div>
@@ -91,10 +91,10 @@ export default function PlayerList() {
       
       {gameState.status === 'drawing' && (
         <div className="mt-4 p-3 bg-blue-500/20 rounded-lg border border-blue-500/40">
-          <div className="text-sm text-blue-200">
+            <div className="text-sm text-black">
             <strong>{gameState.players.find(p => p.isDrawing)?.username}</strong> is drawing
-          </div>
-          <div className="text-xs text-blue-300 mt-1">
+            </div>
+          <div className="text-xs text-blue-600 mt-1">
             Round {gameState.round} of {gameState.maxRounds}
           </div>
         </div>

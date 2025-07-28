@@ -114,7 +114,7 @@ export default function LeaderboardPage() {
       case 1: return <Crown className="w-6 h-6 text-yellow-400" />
       case 2: return <Medal className="w-6 h-6 text-gray-400" />
       case 3: return <Award className="w-6 h-6 text-orange-600" />
-      default: return <span className="w-6 h-6 flex items-center justify-center text-sm font-bold text-white/60">#{rank}</span>
+      default: return <span className="w-6 h-6 flex items-center justify-center text-sm font-bold text-gray-800" style={{ color: '#1A202C' }}>#{rank}</span>
     }
   }
 
@@ -210,7 +210,7 @@ export default function LeaderboardPage() {
             <Button
               onClick={() => router.push('/')}
               variant="outline"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              className="bg-white/90 border-gray-300 text-gray-800 hover:bg-white font-semibold"
             >
               <Home className="w-4 h-4 mr-2" />
               Back to Home
@@ -237,7 +237,8 @@ export default function LeaderboardPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="text-xl text-white/80 mb-8"
+            className="text-xl text-gray-800 font-semibold mb-8"
+            style={{ color: '#1A202C' }}
           >
             Compete with the best players worldwide
           </motion.p>
@@ -258,7 +259,7 @@ export default function LeaderboardPage() {
                     transition-all duration-300 ${
                     selectedPeriod === period.key
                       ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white animate-glow'
-                      : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                      : 'bg-white/90 border-gray-300 text-gray-800 hover:bg-white font-semibold'
                   }`}
                 >
                   <period.icon className="w-4 h-4 mr-2" />
@@ -282,15 +283,15 @@ export default function LeaderboardPage() {
             { icon: TrendingUp, label: 'Average Score', value: stats.averageScore, color: 'from-purple-500 to-pink-500' }
           ].map((stat, index) => (
             <motion.div key={stat.label} variants={itemVariants}>
-              <Card className="glass border-white/20 hover:border-white/40 transition-all duration-300">
+              <Card className="bg-white/95 border-gray-200 hover:border-gray-300 transition-all duration-300 shadow-lg">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color}`}>
                       <stat.icon className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-white/60 text-sm">{stat.label}</p>
-                      <p className="text-2xl font-bold text-white">{stat.value.toLocaleString()}</p>
+                      <p className="text-gray-600 text-sm font-medium">{stat.label}</p>
+                      <p className="text-2xl font-bold text-gray-800" style={{ color: '#1A202C' }}>{stat.value.toLocaleString()}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -305,12 +306,12 @@ export default function LeaderboardPage() {
           initial="hidden"
           animate="visible"
         >
-          <Card className="glass border-white/20">
+          <Card className="glass border-gray-200 bg-white/95">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-3">
-                <Trophy className="w-6 h-6 text-yellow-400" />
+              <CardTitle className="text-gray-800 flex items-center gap-3" style={{ color: '#1A202C' }}>
+                <Trophy className="w-6 h-6 text-yellow-500" />
                 Top Players - {periods.find(p => p.key === selectedPeriod)?.label}
-                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500">
+                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
                   Live
                 </Badge>
               </CardTitle>
@@ -339,8 +340,8 @@ export default function LeaderboardPage() {
                         className={`
                           relative p-4 rounded-xl transition-all duration-300 cursor-pointer
                           ${index < 3 
-                            ? `bg-gradient-to-r ${getRankBadgeColor(index + 1)}/20 border-2 border-gradient-to-r ${getRankBadgeColor(index + 1)}/40` 
-                            : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                            ? `bg-gradient-to-r ${getRankBadgeColor(index + 1)}/20 border-2 border-gradient-to-r ${getRankBadgeColor(index + 1)}/40 bg-white/90` 
+                            : 'bg-white/80 border border-gray-200 hover:bg-white/95'
                           }
                         `}
                       >
@@ -381,7 +382,7 @@ export default function LeaderboardPage() {
                           {/* Player Info */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-bold text-white truncate">
+                              <h3 className="font-bold text-gray-800 truncate" style={{ color: '#1A202C' }}>
                                 {player.username}
                               </h3>
                               {index < 3 && (
@@ -391,7 +392,7 @@ export default function LeaderboardPage() {
                               )}
                             </div>
                             
-                            <div className="flex items-center gap-4 text-sm text-white/60">
+                            <div className="flex items-center gap-4 text-sm text-gray-600" style={{ color: '#4A5568' }}>
                               <span className="flex items-center gap-1">
                                 <Target className="w-3 h-3" />
                                 {player.games_played} games
@@ -406,12 +407,12 @@ export default function LeaderboardPage() {
                           {/* Score */}
                           <div className="text-right">
                             <div className="flex items-center gap-2 mb-1">
-                              <Star className="w-4 h-4 text-yellow-400" />
-                              <span className="text-xl font-bold text-white">
+                              <Star className="w-4 h-4 text-yellow-500" />
+                              <span className="text-xl font-bold text-gray-800" style={{ color: '#1A202C' }}>
                                 {player.total_score.toLocaleString()}
                               </span>
                             </div>
-                            <div className="text-sm text-white/60">
+                            <div className="text-sm text-gray-600" style={{ color: '#4A5568' }}>
                               {player.average_score.toFixed(1)} avg
                             </div>
                           </div>
@@ -437,8 +438,8 @@ export default function LeaderboardPage() {
                       animate={{ opacity: 1 }}
                       className="text-center py-12"
                     >
-                      <Trophy className="w-16 h-16 text-white/20 mx-auto mb-4" />
-                      <p className="text-white/60">No players found for this period</p>
+                      <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600" style={{ color: '#4A5568' }}>No players found for this period</p>
                     </motion.div>
                   )}
                 </div>
@@ -452,7 +453,8 @@ export default function LeaderboardPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="text-center mt-8 text-white/40 text-sm"
+          className="text-center mt-8 text-gray-600 text-sm"
+          style={{ color: '#4A5568' }}
         >
           <p>Leaderboard updates in real-time • Last updated: <span suppressHydrationWarning>{new Date().toLocaleTimeString()}</span></p>
         </motion.div>

@@ -45,7 +45,7 @@ export default function LoginForm() {
           avatar_url: avatarUrl
         })
         
-        toast.success('Welcome to MassKribbl! 🎨')
+        toast.success('🎉 Welcome to MassKribbl! 🎨')
       }
 
       // Set user in store
@@ -70,7 +70,7 @@ export default function LoginForm() {
         setError('Failed to create account. Please try again.')
       }
       
-      toast.error('Login failed. Please try again.')
+      toast.error('❌ Login failed. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -78,50 +78,82 @@ export default function LoginForm() {
 
   return (
     <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
+      initial={{ scale: 0.8, opacity: 0, y: 50 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      transition={{ 
+        type: "spring",
+        stiffness: 200,
+        damping: 20
+      }}
       className="w-full max-w-md"
     >
-      <Card className="glass border-primary/40">
-        <CardHeader className="text-center">
+      <div className="character-card p-0 overflow-hidden">
+        <div className="bg-gradient-to-br from-red-400 via-pink-500 to-purple-600 p-6 text-center relative">
+          {/* Floating decorations */}
           <motion.div
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="mx-auto mb-4"
+            className="absolute top-2 left-4 text-2xl"
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 3, repeat: Infinity }}
           >
-            <Palette className="w-12 h-12 text-primary" />
+            ⭐
           </motion.div>
-          <CardTitle className="text-2xl text-white">
-            Welcome to MassKribbl!
-          </CardTitle>
-          <p className="text-white/60">
-            Enter your details to start drawing and guessing
+          <motion.div
+            className="absolute top-4 right-6 text-xl"
+            animate={{ y: [-5, 5, -5] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            🎨
+          </motion.div>
+          <motion.div
+            className="absolute bottom-2 left-6 text-lg"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            💫
+          </motion.div>
+
+          <motion.div
+            animate={{ 
+              rotate: [0, 10, -10, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ repeat: Infinity, duration: 3 }}
+            className="mx-auto mb-4 text-6xl"
+          >
+            🎭
+          </motion.div>
+          <h2 className="text-3xl font-black text-white mb-2" style={{ textShadow: '2px 2px 0px #2D3748' }}>
+            Join the Fun!
+          </h2>
+          <p className="text-white/90 font-semibold">
+            🌈 Enter your details to start drawing and guessing! 🎉
           </p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        </div>
+
+        <div className="p-6 bg-white">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2 p-3 bg-red-500/20 border border-red-500/40 rounded-lg"
+                initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                className="flex items-center gap-3 p-4 bg-red-100 border-3 border-red-400 rounded-xl"
               >
-                <AlertCircle className="w-4 h-4 text-red-400" />
-                <span className="text-red-200 text-sm">{error}</span>
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                <span className="text-red-700 text-sm font-semibold">{error}</span>
               </motion.div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Username
+              <label className="block text-sm font-bold text-gray-700 mb-3">
+                🎨 Choose Your Artist Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60" />
-                <Input
+                <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <input
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Choose a username"
-                  className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                  placeholder="Enter your creative username"
+                  className="fun-input w-full pl-12"
                   maxLength={20}
                   required
                 />
@@ -129,45 +161,54 @@ export default function LoginForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Email
+              <label className="block text-sm font-bold text-gray-700 mb-3">
+                📧 Your Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60" />
-                <Input
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                  className="fun-input w-full pl-12"
                   required
                 />
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={isLoading || !username.trim() || !email.trim()}
-              className="w-full h-12 text-lg font-medium animate-glow"
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Creating Account...
-                </div>
-              ) : (
-                'Start Playing!'
-              )}
-            </Button>
+              <button
+                type="submit"
+                disabled={isLoading || !username.trim() || !email.trim()}
+                className="fun-button w-full h-14 text-lg font-black disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="text-2xl animate-spin">🎨</div>
+                    <span>Creating Your Account...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="text-2xl">🚀</span>
+                    <span>START PLAYING!</span>
+                    <span className="text-2xl">🎉</span>
+                  </div>
+                )}
+              </button>
+            </motion.div>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-xs text-white/50">
-              Your account will be created automatically. Just pick a username and start playing!
+            <p className="text-xs text-gray-500 font-medium">
+              🎭 Your account will be created automatically. Just pick a username and start playing! 🎨
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   )
 }

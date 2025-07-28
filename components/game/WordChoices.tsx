@@ -33,10 +33,10 @@ export default function WordChoices() {
       <Card className="glass border-primary/40 max-w-md w-full">
         <CardContent className="p-6">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-2xl font-bold text-black mb-2">
               Choose a word to draw
             </h2>
-            <p className="text-white/60">
+            <p className="text-black/60">
               Pick the word you want to draw for other players
             </p>
           </div>
@@ -52,7 +52,7 @@ export default function WordChoices() {
                 <Button
                   onClick={() => selectWord(word)}
                   variant="outline"
-                  className="w-full h-12 text-lg font-medium bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  className="w-full h-12 text-lg font-medium bg-white/10 border-white/20 text-black hover:bg-black/20"
                 >
                   {word}
                 </Button>
@@ -61,7 +61,7 @@ export default function WordChoices() {
           </div>
           
           <div className="mt-6 text-center">
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-black/60">
               Choose wisely! You'll have 80 seconds to draw.
             </p>
           </div>

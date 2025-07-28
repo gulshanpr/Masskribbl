@@ -187,9 +187,9 @@ export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCur
             <div className="absolute inset-0 bg-gradient-to-tr from-yellow-400/10 via-orange-500/10 to-red-500/10 rounded-3xl blur-2xl animate-pulse" />
             
             {/* Main Card */}
-            <Card className="relative glass border-2 border-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 rounded-3xl overflow-hidden">
+            <Card className="relative bg-white/95 border-2 border-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 rounded-3xl overflow-hidden shadow-2xl">
               {/* Animated Background Pattern */}
-              <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0 opacity-5">
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-pink-500 to-purple-600 animate-gradient-x" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)] animate-pulse" />
               </div>
@@ -283,7 +283,8 @@ export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCur
 
                   <motion.h2
                     variants={itemVariants}
-                    className="text-3xl font-bold text-white mt-4 mb-2"
+                    className="text-3xl font-bold text-black mt-4 mb-2"
+                    style={{ color: '#1A202C' }}
                   >
                     {winner.username}
                   </motion.h2>
@@ -294,13 +295,13 @@ export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCur
                   >
                     <Star className="w-5 h-5 text-yellow-400" />
                     <span className="text-2xl font-bold text-yellow-400">{winner.score}</span>
-                    <span className="text-white/80">points</span>
+                    <span className="text-black font-medium" style={{ color: '#1A202C' }}>points</span>
                   </motion.div>
                 </motion.div>
 
                 {/* Leaderboard */}
                 <motion.div variants={itemVariants} className="mb-8">
-                  <h3 className="text-xl font-bold text-white mb-4 flex items-center justify-center gap-2">
+                  <h3 className="text-xl font-bold text-black mb-4 flex items-center justify-center gap-2" style={{ color: '#1A202C' }}>
                     <Trophy className="w-5 h-5 text-yellow-400" />
                     Final Rankings
                   </h3>
@@ -314,10 +315,10 @@ export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCur
                         transition={{ delay: index * 0.1 }}
                         className={`
                           flex items-center gap-3 p-3 rounded-xl transition-all
-                          ${index === 0 ? 'bg-gradient-to-r from-yellow-400/20 to-orange-500/20 border border-yellow-400/30' :
-                            index === 1 ? 'bg-gradient-to-r from-gray-300/20 to-gray-400/20 border border-gray-400/30' :
-                            index === 2 ? 'bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border border-orange-600/30' :
-                            'bg-white/5 border border-white/10'}
+                          ${index === 0 ? 'bg-gradient-to-r from-yellow-100/90 to-orange-100/90 border border-yellow-400/50' :
+                            index === 1 ? 'bg-gradient-to-r from-gray-100/90 to-gray-200/90 border border-gray-400/50' :
+                            index === 2 ? 'bg-gradient-to-r from-orange-100/90 to-yellow-100/90 border border-orange-600/50' :
+                            'bg-white/80 border border-gray-200'}
                           ${player.id === winner.id ? 'ring-2 ring-yellow-400/50' : ''}
                         `}
                       >
@@ -327,7 +328,7 @@ export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCur
                           ${index === 0 ? 'bg-yellow-400 text-black' :
                             index === 1 ? 'bg-gray-400 text-black' :
                             index === 2 ? 'bg-orange-600 text-white' :
-                            'bg-white/20 text-white'}
+                            'bg-gray-300 text-black'}
                         `}>
                           {index + 1}
                         </div>
@@ -341,7 +342,7 @@ export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCur
                         </Avatar>
 
                         {/* Name */}
-                        <span className="flex-1 text-left font-medium text-white">
+                        <span className="flex-1 text-left font-medium text-black" style={{ color: '#1A202C' }}>
                           {player.username}
                           {player.id === winner.id && (
                             <Crown className="inline w-4 h-4 ml-1 text-yellow-400" />
@@ -349,7 +350,7 @@ export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCur
                         </span>
 
                         {/* Score */}
-                        <span className="font-bold text-white">
+                        <span className="font-bold text-black" style={{ color: '#1A202C' }}>
                           {player.score}
                         </span>
                       </motion.div>
@@ -362,7 +363,8 @@ export default function WinnerPopup({ isOpen, onClose, winner, allPlayers, isCur
                   <Button
                     onClick={handleBackToLobby}
                     variant="outline"
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 transition-all duration-300"
+                    className="bg-white/90 border-gray-300 text-black hover:bg-white font-semibold transition-all duration-300"
+                    style={{ color: '#1A202C' }}
                   >
                     <Home className="w-4 h-4 mr-2" />
                     Back to Lobby
