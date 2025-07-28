@@ -7,7 +7,7 @@ import {
 } from '@massalabs/massa-as-sdk';
 import { Args, stringToBytes, bytesToString } from '@massalabs/as-types';
 
-export function createGame(args: StaticArray<u8>): StaticArray<u8> {\
+export function createGame(args: StaticArray<u8>): StaticArray<u8> {
   // check if tokens received
   const receivedAmount = transferredCoins();
   assert(receivedAmount > 0, 'No MAS tokens were sent.');
